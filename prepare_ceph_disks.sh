@@ -20,6 +20,7 @@
 #omreport storage pdisk pdisk=0:0:1 controller=0
 #omreport storage vdisk vdisk=0 controller=0
 #omreport storage vdisk controller=0 | grep "/dev" | grep -v "/dev/sda"
+#omconfig storage controller action=createvdisk controller=0 id_raid=r0 size=max pdisk=0:0:2
 
 echo "This script makes Virtual disks on target systems and destroys any data contained on those physical disks"
 echo "This script attempts to preserve the root disk configuration - It does not interfere with the root disk or its corresponding virtual disks"
