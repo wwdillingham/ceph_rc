@@ -11,8 +11,8 @@ echo "past sudo" >> /tmp/keyscript.log
 chmod 0440 /etc/sudoers.d/$CEPH_ADMIN_USER
 echo "past chmod" >> /tmp/keyscript.log
 
-IDRSAPRIVATE=`echo /mnt/idrsaprivate`
-IDRSAPUBLIC=`echo /mnt/idrsapublic`
+IDRSAPRIVATE=`cat /mnt/idrsaprivate`
+IDRSAPUBLIC=`cat /mnt/idrsapublic`
 
 echo "IDRSAPRIVATE is $IDRSAPRIVATE" >> /tmp/keyscript.log
 echo "IDRSAPUBLIC is $IDRSAPUBLIC" >> /tmp/keyscript.log
