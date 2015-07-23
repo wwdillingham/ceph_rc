@@ -15,3 +15,4 @@ chmod 700 /home/$CEPH_ADMIN_USER/.ssh
 
 echo $IDRSAPUBLIC >> /home/$CEPH_ADMIN_USER/.ssh/authorized_keys
 chmod 0644 /home/$CEPH_ADMIN_USER/.ssh/authorized_keys
+chown -R $CEPH_ADMIN_USER:$CEPH_ADMIN_USER /home/.ssh
