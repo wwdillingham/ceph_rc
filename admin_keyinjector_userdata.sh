@@ -2,21 +2,10 @@
 set -e 
 env > /tmp/keyinjector_userdata_ran
 source /mnt/context.sh
-
-: ${CEPH_ADMIN_USER:?"Need to set CEPH_ADMIN_USER environment variable"}
-
-#create ceph admin user (root user for ceph manipulation) - comes from an evn variable CEPH_ADMIN_USER (in OpenNebula provided by conttextualization custom_vars)
-useradd -d /home/$CEPH_ADMIN_USER -m $CEPH_ADMIN_USER
-echo "$CEPH_ADMIN_USER ALL = (root) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/$CEPH_ADMIN_USER
-chmod 0440 /etc/sudoers.d/$CEPH_ADMIN_USER
-
-IDRSAPRIVATE=`cat idrsaprivate`
-IDRSAPUBLIC=`cat idrsapublic`
-
-mkdir /home/$CEPH_ADMIN_USER/.ssh
-chmod 700 /home/$CEPH_ADMIN_USER/.ssh
-echo $IDRSAPRIVATE > /home/$CEPH_ADMIN_USER/.ssh/id_rsa
-chmod 0600 /home/$CEPH_ADMIN_USER/.ssh/id_rsa
-echo $IDRSAPUBLIC > /home/$CEPH_ADMIN_USER/.ssh/authorized_keys
-chmod 0600 /home/$CEPH_ADMIN_USER/.ssh/authorized_keys
+yum install -y epel-release
+yum install -y git 
+export HOME=/tmp/userdata_launchpad
+git clone https://github.com/wwdillingham/ceph_rc $HOME
+cd $HOME
+bash admin_keyinjector.sh 2>&1 /tmp/admin_keyinjector.log
 
