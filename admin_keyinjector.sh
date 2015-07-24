@@ -15,5 +15,7 @@ chmod 700 /home/$CEPH_ADMIN_USER/.ssh
 echo $IDRSAPRIVATE > /home/$CEPH_ADMIN_USER/.ssh/id_rsa
 chmod 0600 /home/$CEPH_ADMIN_USER/.ssh/id_rsa
 echo $IDRSAPUBLIC > /home/$CEPH_ADMIN_USER/.ssh/authorized_keys
+echo $IDRSAPUBLIC > /home/$CEPH_ADMIN_USER/.ssh/id_rsa.pub
 chmod 0600 /home/$CEPH_ADMIN_USER/.ssh/authorized_keys
+chmod 0600 /home/$CEPH_ADMIN_USER/.ssh/id_rsa.pub
 chown -R $CEPH_ADMIN_USER:$CEPH_ADMIN_USER /home/$CEPH_ADMIN_USER/.ssh
