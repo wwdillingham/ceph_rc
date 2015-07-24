@@ -19,4 +19,5 @@ cp /mnt/idrsapublic.tar.gz/idrsapublic /home/$CEPH_ADMIN_USER/.ssh/authorized_ke
 echo $IDRSAPUBLIC > /home/$CEPH_ADMIN_USER/.ssh/id_rsa.pub
 chmod 0600 /home/$CEPH_ADMIN_USER/.ssh/authorized_keys
 chmod 0600 /home/$CEPH_ADMIN_USER/.ssh/id_rsa.pub
+chmod 0600 /home/$CEPH_ADMIN_USER/.ssh/id_rsa
 chown -R $CEPH_ADMIN_USER:$CEPH_ADMIN_USER /home/$CEPH_ADMIN_USER/.ssh
