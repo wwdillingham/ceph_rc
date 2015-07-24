@@ -7,17 +7,15 @@ useradd -d /home/$CEPH_ADMIN_USER -m $CEPH_ADMIN_USER
 echo "$CEPH_ADMIN_USER ALL = (root) NOPASSWD:ALL" | tee /etc/sudoers.d/$CEPH_ADMIN_USER
 chmod 0440 /etc/sudoers.d/$CEPH_ADMIN_USER
 
-cp /mnt/idrsaprivate.tar.gz/idrsaprivate /tmp
-cp /mnt/idrsapublic.tar.gz/idrsapublic /tmp
+#cp /mnt/idrsaprivate.tar.gz/idrsaprivate /tmp
+#cp /mnt/idrsapublic.tar.gz/idrsapublic /tmp
 
-IDRSAPRIVATE=`cat /tmp/idrsaprivate`
-IDRSAPUBLIC=`cat /tmp/idrsapublic`
 
 mkdir /home/$CEPH_ADMIN_USER/.ssh
 chmod 700 /home/$CEPH_ADMIN_USER/.ssh
-echo $IDRSAPRIVATE > /home/$CEPH_ADMIN_USER/.ssh/id_rsa
-chmod 0600 /home/$CEPH_ADMIN_USER/.ssh/id_rsa
-echo $IDRSAPUBLIC > /home/$CEPH_ADMIN_USER/.ssh/authorized_keys
+cp /mnt/idrsaprivate.tar.gz/idrsaprivate /home/$CEPH_ADMIN_USER/.ssh/id_rsa
+cp /mnt/idrsapublic.tar.gz/idrsapublic /home/$CEPH_ADMIN_USER/.ssh/id_rsa.pub
+cp /mnt/idrsapublic.tar.gz/idrsapublic /home/$CEPH_ADMIN_USER/.ssh/authorized_keys #this will overwrite - should handle other key situations
 echo $IDRSAPUBLIC > /home/$CEPH_ADMIN_USER/.ssh/id_rsa.pub
 chmod 0600 /home/$CEPH_ADMIN_USER/.ssh/authorized_keys
 chmod 0600 /home/$CEPH_ADMIN_USER/.ssh/id_rsa.pub
