@@ -16,7 +16,6 @@ chmod 700 /home/$CEPH_ADMIN_USER/.ssh
 cp /mnt/idrsaprivate.tar.gz/idrsaprivate /home/$CEPH_ADMIN_USER/.ssh/id_rsa
 cp /mnt/idrsapublic.tar.gz/idrsapublic /home/$CEPH_ADMIN_USER/.ssh/id_rsa.pub
 cp /mnt/idrsapublic.tar.gz/idrsapublic /home/$CEPH_ADMIN_USER/.ssh/authorized_keys #this will overwrite - should handle other key situations
-echo $IDRSAPUBLIC > /home/$CEPH_ADMIN_USER/.ssh/id_rsa.pub
 chmod 0600 /home/$CEPH_ADMIN_USER/.ssh/authorized_keys
 chmod 0600 /home/$CEPH_ADMIN_USER/.ssh/id_rsa.pub
 chmod 0600 /home/$CEPH_ADMIN_USER/.ssh/id_rsa
