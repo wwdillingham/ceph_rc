@@ -7,9 +7,9 @@ useradd -d /home/$CEPH_ADMIN_USER -m $CEPH_ADMIN_USER
 echo "$CEPH_ADMIN_USER ALL = (root) NOPASSWD:ALL" | tee /etc/sudoers.d/$CEPH_ADMIN_USER
 chmod 0440 /etc/sudoers.d/$CEPH_ADMIN_USER
 
-cp /mnt/idrsaprivate.tar.gz /tmp
+cp /mnt/idrsaprivate.tar.gz/idraprivate /tmp
 tar -zxf /tmp/idrsaprivate -C /tmp/idrsaprivate
-cp /mnt/idrsapublic.tar.gz /tmp
+cp /mnt/idrsapublic.tar.gz/idrsapublic /tmp
 tar -zxf /tmp/idrsapublic -C /tmp/idrsapublic
 
 IDRSAPRIVATE=`cat /tmp/idrsaprivate`
