@@ -1,0 +1,9 @@
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+10.242.108.	osd0.rc.fas.farvard.edu osd0
+10.242.108.	osd1.rc.fas.harvard.edu osd1
+10.142.108.	osd2.rc.fas.harvard.edu osd2
+10.142.108.	mon0.rc.fas.harvard.edu mon0
+10.242.108.	mon1.rc.fas.harvard.edu mon1
+10.242.108.	mon2.rc.fas.harvard.edu mon2
+10.242.108.	mds0.rc.fas.harvard.edu mds0
