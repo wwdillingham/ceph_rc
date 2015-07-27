@@ -37,11 +37,11 @@ ssh $_MON3 "sudo firewall-cmd --zone=public --add-port=6789/tcp --permanent"
 #Deploy
 ceph-deploy new $_MON1 $_MON2 $_MON3 #initial monitor members
 
- #wait until they form quorum and then
- #gatherkeys, reporting the monitor status along the
- # process. If monitors don't form quorum the command
- # will eventually time out.
- ceph-deploy mon create-initial
+# wait until they form quorum and then
+# gatherkeys, reporting the monitor status along the
+# process. If monitors don't form quorum the command
+# will eventually time out.
+ceph-deploy mon create-initial
 
 
 #####OSDs
@@ -52,9 +52,9 @@ for i in `ssh $_OSD2 "lsblk --output KNAME | grep -i sd | grep -v sda"`; do ceph
 for i in `ssh $_OSD3 "lsblk --output KNAME | grep -i sd | grep -v sda"`; do ceph-deploy disk zap $_OSD3:$i; done
 
 #Deploy the OSDs
-for i in `ssh $OSD1 "lsblk --output KNAME | grep -i sd | grep -v sda"`; do ceph-deploy osd prepare $OSD1:$i:$i; done
-for i in `ssh $OSD2 "lsblk --output KNAME | grep -i sd | grep -v sda"`; do ceph-deploy osd prepare $OSD2:$i:$i; done
-for i in `ssh $OSD3 "lsblk --output KNAME | grep -i sd | grep -v sda"`; do ceph-deploy osd prepare $OSD3:$i:$i; done
+for i in `ssh $_OSD1 "lsblk --output KNAME | grep -i sd | grep -v sda"`; do ceph-deploy osd prepare $_OSD1:$i:$i; done
+for i in `ssh $_OSD2 "lsblk --output KNAME | grep -i sd | grep -v sda"`; do ceph-deploy osd prepare $_OSD2:$i:$i; done
+for i in `ssh $_OSD3 "lsblk --output KNAME | grep -i sd | grep -v sda"`; do ceph-deploy osd prepare $_OSD3:$i:$i; done
 
 #Activate the OSDs
 for i in `ssh $_OSD1 "lsblk --output KNAME | grep -i sd | grep -v sda | grep 1"`; do ceph-deploy osd activate $_OSD1:${i}; done
