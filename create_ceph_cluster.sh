@@ -18,24 +18,24 @@
 # On the OSD hosts that the disks will be raw and clean of any previous configuration.
 
 #host variable definitions
+_MON0=
 _MON1=
 _MON2=
-_MON3=
-_MDS1=
+_MDS0=
+_OSD0=
 _OSD1=
 _OSD2=
-_OSD3=
 _ADMIN1=
 
 #####Mons
 
 #Prepare Firewall
-ssh $_MON1 "sudo firewall-cmd --zone=public --add-port=6789/tcp --permanent"
-ssh $_MON2 "sudo firewall-cmd --zone=public --add-port=6789/tcp --permanent"
-ssh $_MON3 "sudo firewall-cmd --zone=public --add-port=6789/tcp --permanent"
+ssh -t $_MON0 "sudo firewall-cmd --zone=public --add-port=6789/tcp --permanent"
+ssh -t $_MON1 "sudo firewall-cmd --zone=public --add-port=6789/tcp --permanent"
+ssh -t $_MON2 "sudo firewall-cmd --zone=public --add-port=6789/tcp --permanent"
 
 #Deploy
-ceph-deploy new $_MON1 $_MON2 $_MON3 #initial monitor members
+ceph-deploy new $_MON0 $_MON1 $_MON2 #initial monitor members
 
 # wait until they form quorum and then
 # gatherkeys, reporting the monitor status along the
@@ -47,19 +47,19 @@ ceph-deploy mon create-initial
 #####OSDs
 
 #first zap the disks
+for i in `ssh $_OSD0 "lsblk --output KNAME | grep -i sd | grep -v sda"`; do ceph-deploy disk zap $_OSD0:$i; done
 for i in `ssh $_OSD1 "lsblk --output KNAME | grep -i sd | grep -v sda"`; do ceph-deploy disk zap $_OSD1:$i; done
 for i in `ssh $_OSD2 "lsblk --output KNAME | grep -i sd | grep -v sda"`; do ceph-deploy disk zap $_OSD2:$i; done
-for i in `ssh $_OSD3 "lsblk --output KNAME | grep -i sd | grep -v sda"`; do ceph-deploy disk zap $_OSD3:$i; done
 
 #Deploy the OSDs
+for i in `ssh $_OSD0 "lsblk --output KNAME | grep -i sd | grep -v sda"`; do ceph-deploy osd prepare $_OSD0:$i:$i; done
 for i in `ssh $_OSD1 "lsblk --output KNAME | grep -i sd | grep -v sda"`; do ceph-deploy osd prepare $_OSD1:$i:$i; done
 for i in `ssh $_OSD2 "lsblk --output KNAME | grep -i sd | grep -v sda"`; do ceph-deploy osd prepare $_OSD2:$i:$i; done
-for i in `ssh $_OSD3 "lsblk --output KNAME | grep -i sd | grep -v sda"`; do ceph-deploy osd prepare $_OSD3:$i:$i; done
 
 #Activate the OSDs
+for i in `ssh $_OSD0 "lsblk --output KNAME | grep -i sd | grep -v sda | grep 1"`; do ceph-deploy osd activate $_OSD0:${i}; done
 for i in `ssh $_OSD1 "lsblk --output KNAME | grep -i sd | grep -v sda | grep 1"`; do ceph-deploy osd activate $_OSD1:${i}; done
 for i in `ssh $_OSD2 "lsblk --output KNAME | grep -i sd | grep -v sda | grep 1"`; do ceph-deploy osd activate $_OSD2:${i}; done
-for i in `ssh $_OSD3 "lsblk --output KNAME | grep -i sd | grep -v sda | grep 1"`; do ceph-deploy osd activate $_OSD3:${i}; done
 
 #check cluster health
 ceph health
