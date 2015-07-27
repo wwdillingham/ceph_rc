@@ -17,6 +17,49 @@
 #This script expects that the target systems will have an OS installed, a user (cephrc) with passwordless sudo, 
 # On the OSD hosts that the disks will be raw and clean of any previous configuration.
 
+#host variable definitions
+_MON1=
+_MON2=
+_MON3=
+_MDS1=
+_OSD1=
+_OSD2=
+_OSD3=
+_ADMIN1=
+
+#####Mons
+
+#Prepare Firewall
+ssh $_MON1 "sudo firewall-cmd --zone=public --add-port=6789/tcp --permanent"
+ssh $_MON2 "sudo firewall-cmd --zone=public --add-port=6789/tcp --permanent"
+ssh $_MON3 "sudo firewall-cmd --zone=public --add-port=6789/tcp --permanent"
+
+#Deploy
+ceph-deploy new $_MON1 $_MON2 $_MON3 #initial monitor members
+
+ #wait until they form quorum and then
+ #gatherkeys, reporting the monitor status along the
+ # process. If monitors don't form quorum the command
+ # will eventually time out.
+ ceph-deploy mon create-initial
 
 
-#
+#####OSDs
+
+#first zap the disks
+for i in `ssh $_OSD1 "lsblk --output KNAME | grep -i sd | grep -v sda"`; do ceph-deploy disk zap $_OSD1:$i; done
+for i in `ssh $_OSD2 "lsblk --output KNAME | grep -i sd | grep -v sda"`; do ceph-deploy disk zap $_OSD2:$i; done
+for i in `ssh $_OSD3 "lsblk --output KNAME | grep -i sd | grep -v sda"`; do ceph-deploy disk zap $_OSD3:$i; done
+
+#Deploy the OSDs
+for i in `ssh $OSD1 "lsblk --output KNAME | grep -i sd | grep -v sda"`; do ceph-deploy osd prepare $OSD1:$i:$i; done
+for i in `ssh $OSD2 "lsblk --output KNAME | grep -i sd | grep -v sda"`; do ceph-deploy osd prepare $OSD2:$i:$i; done
+for i in `ssh $OSD3 "lsblk --output KNAME | grep -i sd | grep -v sda"`; do ceph-deploy osd prepare $OSD3:$i:$i; done
+
+#Activate the OSDs
+for i in `ssh $_OSD1 "lsblk --output KNAME | grep -i sd | grep -v sda | grep 1"`; do ceph-deploy osd activate $_OSD1:${i}; done
+for i in `ssh $_OSD2 "lsblk --output KNAME | grep -i sd | grep -v sda | grep 1"`; do ceph-deploy osd activate $_OSD2:${i}; done
+for i in `ssh $_OSD3 "lsblk --output KNAME | grep -i sd | grep -v sda | grep 1"`; do ceph-deploy osd activate $_OSD3:${i}; done
+
+#check cluster health
+ceph health
