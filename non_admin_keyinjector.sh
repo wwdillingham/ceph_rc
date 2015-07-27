@@ -20,3 +20,5 @@ chmod 0600 /home/$CEPH_ADMIN_USER/.ssh/authorized_keys
 chmod 0600 /home/$CEPH_ADMIN_USER/.ssh/id_rsa.pub
 chmod 0600 /home/$CEPH_ADMIN_USER/.ssh/id_rsa
 chown -R $CEPH_ADMIN_USER:$CEPH_ADMIN_USER /home/$CEPH_ADMIN_USER/.ssh
+yum install -y ntp ntpdate ntp-doc
+
