@@ -34,8 +34,12 @@ ssh -t $_MON0 "sudo firewall-cmd --zone=public --add-port=6789/tcp --permanent"
 ssh -t $_MON1 "sudo firewall-cmd --zone=public --add-port=6789/tcp --permanent"
 ssh -t $_MON2 "sudo firewall-cmd --zone=public --add-port=6789/tcp --permanent"
 
+
 #Deploy
 ceph-deploy new $_MON0 $_MON1 $_MON2 #initial monitor members
+
+#Install ceph
+ceph-deploy --overwrite-conf install $_ADMIN1 $_MON0 $_MON1 $_MON2 $_MDS0 $_OSD0 $_OSD1 $_OSD2
 
 # wait until they form quorum and then
 # gatherkeys, reporting the monitor status along the
