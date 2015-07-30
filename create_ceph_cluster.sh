@@ -30,10 +30,14 @@ _ADMIN1=
 #####Mons
 
 #Prepare Firewall
-ssh -t $_MON0 "sudo firewall-cmd --zone=public --add-port=6789/tcp --permanent"
-ssh -t $_MON1 "sudo firewall-cmd --zone=public --add-port=6789/tcp --permanent"
-ssh -t $_MON2 "sudo firewall-cmd --zone=public --add-port=6789/tcp --permanent"
-
+ssh -t $_MON0 "sudo service firewalld stop"
+ssh -t $_MON1 "sudo service firewalld stop"
+ssh -t $_MON2 "sudo service firewalld stop"
+ssh -t $_MDS0 "sudo service firewalld stop"
+ssh -t $_OSD0 "sudo service firewalld stop"
+ssh -t $_OSD1 "sudo service firewalld stop"
+ssh -t $_OSD2 "sudo service firewalld stop"
+sudo service firewalld stop
 
 #Deploy
 ceph-deploy new $_MON0 $_MON1 $_MON2 #initial monitor members
