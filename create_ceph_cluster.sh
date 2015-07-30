@@ -27,7 +27,6 @@ _OSD1=
 _OSD2=
 _ADMIN1=
 
-#####Mons
 
 #Prepare Firewall
 ssh -t $_MON0 "sudo service firewalld stop"
@@ -38,6 +37,19 @@ ssh -t $_OSD0 "sudo service firewalld stop"
 ssh -t $_OSD1 "sudo service firewalld stop"
 ssh -t $_OSD2 "sudo service firewalld stop"
 sudo service firewalld stop
+
+#disable requiretty
+ssh -t $_MON0 "sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers"
+ssh -t $_MON1 "sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers"
+ssh -t $_MON2 "sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers"
+ssh -t $_MDS0 "sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers"
+ssh -t $_OSD0 "sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers"
+ssh -t $_OSD1 "sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers"
+ssh -t $_OSD2 "sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers"
+sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers
+
+
+#####Mons
 
 #Deploy
 ceph-deploy new $_MON0 $_MON1 $_MON2 #initial monitor members
