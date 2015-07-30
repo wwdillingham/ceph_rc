@@ -27,6 +27,9 @@ _OSD1=
 _OSD2=
 _ADMIN1=
 
+#Make This Directory owned by CEPH_ADMIN_USER
+sudo chown -R $CEPH_ADMIN_USER:$CEPH_ADMIN_USER /tmp/userdata_launchpad
+
 
 #Prepare Firewall
 ssh -t $_MON0 "sudo service firewalld stop"
@@ -47,6 +50,16 @@ ssh -t $_OSD0 "sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /et
 ssh -t $_OSD1 "sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers"
 ssh -t $_OSD2 "sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers"
 sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers
+
+#Start NTP
+ssh -t $_MON0 "sudo systemctl start ntpd && sudo systemctl enable ntpd"
+ssh -t $_MON1 "sudo systemctl start ntpd && sudo systemctl enable ntpd"
+ssh -t $_MON2 "sudo systemctl start ntpd && sudo systemctl enable ntpd"
+ssh -t $_MDS0 "sudo systemctl start ntpd && sudo systemctl enable ntpd"
+ssh -t $_OSD0 "sudo systemctl start ntpd && sudo systemctl enable ntpd"
+ssh -t $_OSD1 "sudo systemctl start ntpd && sudo systemctl enable ntpd"
+ssh -t $_OSD2 "sudo systemctl start ntpd && sudo systemctl enable ntpd"
+sudo systemctl start ntpd && sudo systemctl enable ntpd
 
 
 #####Mons
