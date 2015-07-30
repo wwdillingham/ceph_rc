@@ -94,11 +94,10 @@ ceph-deploy --overwrite-conf mon create-initial
 ceph-deploy gatherkeys $_MON0
 
 #####OSDs
-
 #first zap the disks
-for i in `ssh $_OSD0 "lsblk --output KNAME | grep -i sd | grep -v sda"`; do ceph-deploy disk zap $_OSD0:$i; done
-for i in `ssh $_OSD1 "lsblk --output KNAME | grep -i sd | grep -v sda"`; do ceph-deploy disk zap $_OSD1:$i; done
-for i in `ssh $_OSD2 "lsblk --output KNAME | grep -i sd | grep -v sda"`; do ceph-deploy disk zap $_OSD2:$i; done
+for i in `ssh $_OSD0 "lsblk --output KNAME | grep -i sd | grep -v sda | grep -v [0-9]"`; do ceph-deploy disk zap $_OSD0:$i; done
+for i in `ssh $_OSD1 "lsblk --output KNAME | grep -i sd | grep -v sda | grep -v [0-9]"`; do ceph-deploy disk zap $_OSD1:$i; done
+for i in `ssh $_OSD2 "lsblk --output KNAME | grep -i sd | grep -v sda | grep -v [0-9]"`; do ceph-deploy disk zap $_OSD2:$i; done
 
 #Deploy the OSDs
 for i in `ssh $_OSD0 "lsblk --output KNAME | grep -i sd | grep -v sda"`; do ceph-deploy osd prepare $_OSD0:$i:$i; done
