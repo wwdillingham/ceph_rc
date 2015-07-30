@@ -17,16 +17,6 @@
 #This script expects that the target systems will have an OS installed, a user (cephrc) with passwordless sudo, 
 # On the OSD hosts that the disks will be raw and clean of any previous configuration.
 
-#host variable definitions
-_MON0=
-_MON1=
-_MON2=
-_MDS0=
-_OSD0=
-_OSD1=
-_OSD2=
-_ADMIN1=
-
 #Make This Directory owned by CEPH_ADMIN_USER
 sudo chown -R $CEPH_ADMIN_USER:$CEPH_ADMIN_USER /tmp/userdata_launchpad
 
