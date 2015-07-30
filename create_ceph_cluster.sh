@@ -56,6 +56,9 @@ rsync -avhP --rsync-path="sudo rsync" ceph.mon.keyring $_OSD2:/etc/ceph/ceph.mon
 # will eventually time out.
 ceph-deploy --overwrite-conf mon create-initial
 
+#gather keys
+ceph-deploy gatherkeys $_MON0
+
 #####OSDs
 
 #first zap the disks
