@@ -41,6 +41,11 @@ ceph-deploy new $_MON0 $_MON1 $_MON2 #initial monitor members
 #Install ceph
 ceph-deploy --overwrite-conf install $_ADMIN1 $_MON0 $_MON1 $_MON2 $_MDS0 $_OSD0 $_OSD1 $_OSD2
 
+#Copy Mon Keyring
+rsync -avhP --rsync-path="sudo rsync" ceph.mon.keyring $_OSD0:/etc/ceph/ceph.mon.keyring
+rsync -avhP --rsync-path="sudo rsync" ceph.mon.keyring $_OSD1:/etc/ceph/ceph.mon.keyring
+rsync -avhP --rsync-path="sudo rsync" ceph.mon.keyring $_OSD2:/etc/ceph/ceph.mon.keyring
+
 # wait until they form quorum and then
 # gatherkeys, reporting the monitor status along the
 # process. If monitors don't form quorum the command
