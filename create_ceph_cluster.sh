@@ -45,8 +45,7 @@ ceph-deploy --overwrite-conf install $_ADMIN1 $_MON0 $_MON1 $_MON2 $_MDS0 $_OSD0
 # gatherkeys, reporting the monitor status along the
 # process. If monitors don't form quorum the command
 # will eventually time out.
-ceph-deploy mon create-initial
-
+ceph-deploy --overwrite-conf mon create-initial
 
 #####OSDs
 
