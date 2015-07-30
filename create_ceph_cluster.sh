@@ -31,6 +31,15 @@ _ADMIN1=
 sudo chown -R $CEPH_ADMIN_USER:$CEPH_ADMIN_USER /tmp/userdata_launchpad
 
 
+#Gather Hostkeys
+ssh-keyscan -H $_MON0 >> ~/.ssh/known_hosts
+ssh-keyscan -H $_MON1 >> ~/.ssh/known_hosts
+ssh-keyscan -H $_MON2 >> ~/.ssh/known_hosts
+ssh-keyscan -H $_MDS0 >> ~/.ssh/known_hosts
+ssh-keyscan -H $_OSD0 >> ~/.ssh/known_hosts
+ssh-keyscan -H $_OSD1 >> ~/.ssh/known_hosts
+ssh-keyscan -H $_OSD2 >> ~/.ssh/known_hosts
+
 #Prepare Firewall
 ssh -t $_MON0 "sudo service firewalld stop"
 ssh -t $_MON1 "sudo service firewalld stop"
@@ -42,14 +51,14 @@ ssh -t $_OSD2 "sudo service firewalld stop"
 sudo service firewalld stop
 
 #disable requiretty
-ssh -t $_MON0 "sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers"
-ssh -t $_MON1 "sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers"
-ssh -t $_MON2 "sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers"
-ssh -t $_MDS0 "sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers"
-ssh -t $_OSD0 "sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers"
-ssh -t $_OSD1 "sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers"
-ssh -t $_OSD2 "sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers"
-sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers
+ssh -t $_MON0 "sudo sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers"
+ssh -t $_MON1 "sudo sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers"
+ssh -t $_MON2 "sudo sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers"
+ssh -t $_MDS0 "sudo sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers"
+ssh -t $_OSD0 "sudo sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers"
+ssh -t $_OSD1 "sudo sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers"
+ssh -t $_OSD2 "sudo sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers"
+sudo sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers
 
 #Start NTP
 ssh -t $_MON0 "sudo systemctl start ntpd && sudo systemctl enable ntpd"
