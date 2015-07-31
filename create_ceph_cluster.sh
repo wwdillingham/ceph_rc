@@ -91,20 +91,24 @@ ceph-deploy mon create-initial
 ceph-deploy gatherkeys $_MON0
 
 #####OSDs
+
+#need to determine where the root disk is, either /dev/vda1 or /dev/sda1 this is important because if root disk is at /dev/sda1 we should not attempt use it for ceph. We do this by adding in a grep -v when zapping, deploying, and activating
+_DEVPREFIX_OSD0=$(ssh -q -t $_OSD0 df -h / | grep -i dev | awk -F " " '{print $1}'| awk -F "/" '{print $3}' | cut -c1,2,3 )
+_DEVPREFIX_OSD1=$(ssh -q -t $_OSD0 df -h / | grep -i dev | awk -F " " '{print $1}'| awk -F "/" '{print $3}' | cut -c1,2,3 )
+_DEVPREFIX_OSD2=$(ssh -q -t $_OSD0 df -h / | grep -i dev | awk -F " " '{print $1}'| awk -F "/" '{print $3}' | cut -c1,2,3 )
+
 #first zap the disks
-for i in `ssh $_OSD0 "lsblk --output KNAME | grep -i sd | grep -v sda | grep -v [0-9]"`; do ceph-deploy disk zap $_OSD0:$i; done
-for i in `ssh $_OSD1 "lsblk --output KNAME | grep -i sd | grep -v sda | grep -v [0-9]"`; do ceph-deploy disk zap $_OSD1:$i; done
-for i in `ssh $_OSD2 "lsblk --output KNAME | grep -i sd | grep -v sda | grep -v [0-9]"`; do ceph-deploy disk zap $_OSD2:$i; done
+for i in `ssh $_OSD0 "lsblk --output KNAME | grep -i sd | grep -v $_DEVPREFIX_OSD0 | grep -v [0-9]"`; do ceph-deploy disk zap $_OSD0:$i; done
+for i in `ssh $_OSD1 "lsblk --output KNAME | grep -i sd | grep -v $_DEVPREFIX_OSD1 | grep -v [0-9]"`; do ceph-deploy disk zap $_OSD1:$i; done
+for i in `ssh $_OSD2 "lsblk --output KNAME | grep -i sd | grep -v $_DEVPREFIX_OSD2 | grep -v [0-9]"`; do ceph-deploy disk zap $_OSD2:$i; done
 
 #Deploy the OSDs
-for i in `ssh $_OSD0 "lsblk --output KNAME | grep -i sd | grep -v sda"`; do ceph-deploy osd prepare $_OSD0:$i:$i; done
-for i in `ssh $_OSD1 "lsblk --output KNAME | grep -i sd | grep -v sda"`; do ceph-deploy osd prepare $_OSD1:$i:$i; done
-for i in `ssh $_OSD2 "lsblk --output KNAME | grep -i sd | grep -v sda"`; do ceph-deploy osd prepare $_OSD2:$i:$i; done
+for i in `ssh $_OSD0 "lsblk --output KNAME | grep -i sd | grep -v $_DEVPREFIX_OSD0"`; do ceph-deploy osd prepare $_OSD0:$i:$i; done
+for i in `ssh $_OSD1 "lsblk --output KNAME | grep -i sd | grep -v $_DEVPREFIX_OSD1"`; do ceph-deploy osd prepare $_OSD1:$i:$i; done
+for i in `ssh $_OSD2 "lsblk --output KNAME | grep -i sd | grep -v $_DEVPREFIX_OSD2"`; do ceph-deploy osd prepare $_OSD2:$i:$i; done
 
 #Activate the OSDs
-for i in `ssh $_OSD0 "lsblk --output KNAME | grep -i sd | grep -v sda | grep 1"`; do ceph-deploy osd activate $_OSD0:${i}; done
-for i in `ssh $_OSD1 "lsblk --output KNAME | grep -i sd | grep -v sda | grep 1"`; do ceph-deploy osd activate $_OSD1:${i}; done
-for i in `ssh $_OSD2 "lsblk --output KNAME | grep -i sd | grep -v sda | grep 1"`; do ceph-deploy osd activate $_OSD2:${i}; done
+for i in `ssh $_OSD0 "lsblk --output KNAME | grep -i sd | grep -v $_DEVPREFIX_OSD0 | grep 1"`; do ceph-deploy osd activate $_OSD0:${i}; done
+for i in `ssh $_OSD1 "lsblk --output KNAME | grep -i sd | grep -v $_DEVPREFIX_OSD1 | grep 1"`; do ceph-deploy osd activate $_OSD1:${i}; done
+for i in `ssh $_OSD2 "lsblk --output KNAME | grep -i sd | grep -v $_DEVPREFIX_OSD2 | grep 1"`; do ceph-deploy osd activate $_OSD2:${i}; done
 
-#check cluster health
-ceph health
