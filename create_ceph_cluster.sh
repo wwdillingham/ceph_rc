@@ -51,6 +51,13 @@ ssh -t $_OSD2 "sudo sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/
 sudo sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers
 
 #Start NTP
+rsync --rsync-path="sudo rsync" ntp.conf $_MON0:/etc/ntp/conf
+rsync --rsync-path="sudo rsync" ntp.conf $_MON1:/etc/ntp/conf
+rsync --rsync-path="sudo rsync" ntp.conf $_MON2:/etc/ntp/conf
+rsync --rsync-path="sudo rsync" ntp.conf $_MDS0:/etc/ntp/conf
+rsync --rsync-path="sudo rsync" ntp.conf $_OSD0:/etc/ntp/conf
+rsync --rsync-path="sudo rsync" ntp.conf $_OSD1:/etc/ntp/conf
+rsync --rsync-path="sudo rsync" ntp.conf $_OSD2:/etc/ntp/conf
 ssh -t $_MON0 "sudo systemctl start ntpd && sudo systemctl enable ntpd"
 ssh -t $_MON1 "sudo systemctl start ntpd && sudo systemctl enable ntpd"
 ssh -t $_MON2 "sudo systemctl start ntpd && sudo systemctl enable ntpd"
