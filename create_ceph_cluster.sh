@@ -67,7 +67,7 @@ sudo systemctl start ntpd && sudo systemctl enable ntpd
 ceph-deploy new $_MON0 $_MON1 $_MON2 #initial monitor members
 
 #Install ceph
-ceph-deploy --overwrite-conf install $_MON0 $_MON1 $_MON2 $_MDS0 $_OSD0 $_OSD1 $_OSD2
+ceph-deploy install $_MON0 $_MON1 $_MON2 $_MDS0 $_OSD0 $_OSD1 $_OSD2
 
 #Copy Mon Keyring
 rsync -avhP --rsync-path="sudo rsync" ceph.mon.keyring $_OSD0:/etc/ceph/ceph.mon.keyring
@@ -78,7 +78,7 @@ rsync -avhP --rsync-path="sudo rsync" ceph.mon.keyring $_OSD2:/etc/ceph/ceph.mon
 # gatherkeys, reporting the monitor status along the
 # process. If monitors don't form quorum the command
 # will eventually time out.
-ceph-deploy --overwrite-conf mon create-initial
+ceph-deploy mon create-initial
 
 #gather keys
 ceph-deploy gatherkeys $_MON0
