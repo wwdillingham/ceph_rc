@@ -17,6 +17,18 @@
 #This script expects that the target systems will have an OS installed, a user (cephrc) with passwordless sudo, 
 # On the OSD hosts that the disks will be raw and clean of any previous configuration.
 
+#Functions:
+function getPowTwo() {
+#this function find the first power of 2 greater than the number passed to it 
+let i=2
+while [[ k -lt $1 ]]
+do
+  k=$((2**$i))
+  i=$((i+1))
+done
+PGNUM=$k
+}
+
 #Make This Directory owned by CEPH_ADMIN_USER
 sudo chown -R $CEPH_ADMIN_USER:$CEPH_ADMIN_USER /tmp/userdata_launchpad
 
@@ -75,6 +87,7 @@ ceph-deploy new $_MON0 $_MON1 $_MON2 #initial monitor members
 
 #Install ceph
 ceph-deploy install $_MON0 $_MON1 $_MON2 $_MDS0 $_OSD0 $_OSD1 $_OSD2
+#At this point a ceph.conf has been generated in the current working directory of the admin script.
 
 #Copy Mon Keyring
 rsync -avhP --rsync-path="sudo rsync" ceph.mon.keyring $_OSD0:/etc/ceph/ceph.mon.keyring
@@ -96,6 +109,46 @@ ceph-deploy gatherkeys $_MON0
 DEVPREFIX_OSD0=$(ssh -q -t $_OSD0 df -h / | grep -i dev | awk -F " " '{print $1}'| awk -F "/" '{print $3}' | cut -c1,2,3 )
 DEVPREFIX_OSD1=$(ssh -q -t $_OSD0 df -h / | grep -i dev | awk -F " " '{print $1}'| awk -F "/" '{print $3}' | cut -c1,2,3 )
 DEVPREFIX_OSD2=$(ssh -q -t $_OSD0 df -h / | grep -i dev | awk -F " " '{print $1}'| awk -F "/" '{print $3}' | cut -c1,2,3 )
+
+#Need to determine The number of OSDs in the entire cluster, this is important for calculating the number of PGS
+#PGs are determined using the following guideline from here: http://ceph.com/docs/master/rados/operations/placement-groups/
+#Less than 5 OSDs set pg_num to 128
+#Between 5 and 10 OSDs set pg_num to 512
+#Between 10 and 50 OSDs set pg_num to 4096
+#If you have more than 50 OSDs, Calculate using the following equation:
+#Total PGs = (OSDs * 100) / pool size
+#Where pool size is either the # of replicas for replicated pools or the K+M sum for erasure coded pools (as returned by ceph osd erasure code-profile get)
+
+for i in `ssh $_OSD0 "lsblk --output KNAME | grep -i sd | grep -v vda | grep -v [0-9]"`; do OSDCOUNT_OSD0=$((OSDCOUNT_OSD0+1)); done #line needs to be generates per OSD host
+for i in `ssh $_OSD0 "lsblk --output KNAME | grep -i sd | grep -v vda | grep -v [0-9]"`; do OSDCOUNT_OSD1=$((OSDCOUNT_OSD1+1)); done #line needs to be generates per OSD host
+for i in `ssh $_OSD0 "lsblk --output KNAME | grep -i sd | grep -v vda | grep -v [0-9]"`; do OSDCOUNT_OSD2=$((OSDCOUNT_OSD2+1)); done #line needs to be generates per OSD host
+TOTALOSDCOUNT= $OSDCOUNT_OSD0 + $OSDCOUNT_OSD1 + $OSDCOUNT_OSD2 #This summation list is dynamically generated in the puppet template
+
+echo "Number of OSDs: $TOTALOSDCOUNT"
+echo "Number of Replicas: $_NUM_REPLICAS"
+
+#implement logic to set number of placement groups  appropriately
+if [ $TOTALOSDCOUNT -le 5 ];
+then
+        PGNUM=128
+elif [[ $TOTALOSDCOUNT -gt 5 && $TOTALOSDCOUNT -le 10 ]];
+then
+        PGNUM=512
+elif [[ $TOTALOSDCOUNT -gt 10 && $TOTALOSDCOUNT -le 61 ]];
+then
+        PGNUM=4096
+elif [ $TOTALOSDCOUNT -gt 61 ];
+then
+        TEMP_PGNUM=$((TOTALOSDCOUNT * 100  / _NUM_REPLICAS))
+        getPowTwo "$TEMP_PGNUM"
+else
+        echo "ERROR variable:TOTALOSDCOUNT (total number of osds in this cluster) is not a usable number, cannot determine # of PGs based on its value: $TOTALOSDCOUNT"
+fi
+
+echo "PGNUM is $PGNUM"
+
+#Modify the conf to reflect the new number of placement groups
+
 
 #first zap the disks
 for i in `ssh $_OSD0 "lsblk --output KNAME | grep -i sd | grep -v $DEVPREFIX_OSD0 | grep -v [0-9]"`; do ceph-deploy disk zap $_OSD0:$i; done
