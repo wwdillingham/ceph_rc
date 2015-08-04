@@ -93,10 +93,12 @@ sudo systemctl start ntpd && sudo systemctl enable ntpd
 #Deploy
 #ceph-deploy --cluster $_CLUSTER_NAME new $_MON0 $_MON1 $_MON2 #custom cluster naming not supported on sysvinit hosts yet
 ceph-deploy new $_MON0 $_MON1 $_MON2 #initial monitor members
+#A ceph.conf a ceph.log and a mon keyring are now created withing the current working directory
+SCRIPTLOC=`readlink -f $0 | rev | cut -d "/" -f2- | rev`
+echo "osd pool default size = $_NUM_REPLICAS" >> $SCRIPTLOC/ceph.conf
 
 #Install ceph
 ceph-deploy install $_MON0 $_MON1 $_MON2 $_MDS0 $_OSD0 $_OSD1 $_OSD2
-#At this point a ceph.conf has been generated in the current working directory of the admin script.
 
 #Copy Mon Keyring
 rsync -avhP --rsync-path="sudo rsync" ceph.mon.keyring $_OSD0:/etc/ceph/ceph.mon.keyring
