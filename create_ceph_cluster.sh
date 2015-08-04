@@ -177,4 +177,12 @@ for i in `ssh $_OSD2 "lsblk --output KNAME | grep -i sd | grep -v $DEVPREFIX_OSD
 for i in `ssh $_OSD0 "lsblk --output KNAME | grep -i sd | grep -v $DEVPREFIX_OSD0 | grep 1"`; do ceph-deploy osd activate $_OSD0:${i}; done
 for i in `ssh $_OSD1 "lsblk --output KNAME | grep -i sd | grep -v $DEVPREFIX_OSD1 | grep 1"`; do ceph-deploy osd activate $_OSD1:${i}; done
 for i in `ssh $_OSD2 "lsblk --output KNAME | grep -i sd | grep -v $DEVPREFIX_OSD2 | grep 1"`; do ceph-deploy osd activate $_OSD2:${i}; done
+#At this point the ceph-deploy is complete, 1 pool exists called "rbd" and it doesnt appear to be obeying the rules of placement groups defined in our ceph.conf
+
+
+#create pool as defined by _INITIAL_POOL in source.sh and set it to use the calculated amount of placement groups
+ceph osd pool create $_INITIAL_POOL $PGNUM
+
+sleep 20 #give pgs time to be created, this may need to be adjusted, or logic needs to be built in to wait till pg's are built
+ceph osd pool set $_INITIAL_POOL pgp_num $PGNUM #this will cause rebalancing, but the cluster is empty, of course
 
