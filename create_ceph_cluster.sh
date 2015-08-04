@@ -97,25 +97,6 @@ ceph-deploy new $_MON0 $_MON1 $_MON2 #initial monitor members
 SCRIPTLOC=`readlink -f $0 | rev | cut -d "/" -f2- | rev`
 echo "osd pool default size = $_NUM_REPLICAS" >> $SCRIPTLOC/ceph.conf
 
-#Install ceph
-ceph-deploy install $_MON0 $_MON1 $_MON2 $_MDS0 $_OSD0 $_OSD1 $_OSD2
-
-#Copy Mon Keyring
-rsync -avhP --rsync-path="sudo rsync" ceph.mon.keyring $_OSD0:/etc/ceph/ceph.mon.keyring
-rsync -avhP --rsync-path="sudo rsync" ceph.mon.keyring $_OSD1:/etc/ceph/ceph.mon.keyring
-rsync -avhP --rsync-path="sudo rsync" ceph.mon.keyring $_OSD2:/etc/ceph/ceph.mon.keyring
-
-# wait until they form quorum and then
-# gatherkeys, reporting the monitor status along the
-# process. If monitors don't form quorum the command
-# will eventually time out.
-ceph-deploy mon create-initial
-
-#gather keys
-ceph-deploy gatherkeys $_MON0
-
-#####OSDs
-
 #need to determine where the root disk is, either /dev/vda1 or /dev/sda1 this is important because if root disk is at /dev/sda1 we should not attempt use it for ceph. We do this by adding in a grep -v when zapping, deploying, and activating
 DEVPREFIX_OSD0=$(ssh -q -t $_OSD0 df -h / | grep -i dev | awk -F " " '{print $1}'| awk -F "/" '{print $3}' | cut -c1,2,3 )
 DEVPREFIX_OSD1=$(ssh -q -t $_OSD0 df -h / | grep -i dev | awk -F " " '{print $1}'| awk -F "/" '{print $3}' | cut -c1,2,3 )
@@ -158,7 +139,28 @@ fi
 
 echo "PGNUM is $PGNUM"
 
-#Modify the conf to reflect the new number of placement groups
+#need to modify ceph.conf to use calculated pg and pgp
+echo "osd pool default pg num = $PGNUM" >> $SCRIPTLOC/ceph.conf
+echo "osd pool default pgp num = $PGNUM" >> $SCRIPTLOC/ceph.conf
+
+#Install ceph
+ceph-deploy install $_MON0 $_MON1 $_MON2 $_MDS0 $_OSD0 $_OSD1 $_OSD2
+
+#Copy Mon Keyring
+rsync -avhP --rsync-path="sudo rsync" ceph.mon.keyring $_OSD0:/etc/ceph/ceph.mon.keyring
+rsync -avhP --rsync-path="sudo rsync" ceph.mon.keyring $_OSD1:/etc/ceph/ceph.mon.keyring
+rsync -avhP --rsync-path="sudo rsync" ceph.mon.keyring $_OSD2:/etc/ceph/ceph.mon.keyring
+
+# wait until they form quorum and then
+# gatherkeys, reporting the monitor status along the
+# process. If monitors don't form quorum the command
+# will eventually time out.
+ceph-deploy mon create-initial
+
+#gather keys
+ceph-deploy gatherkeys $_MON0
+
+#####OSDs
 
 
 #first zap the disks
