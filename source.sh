@@ -5,4 +5,5 @@ export _MDS0=
 export _OSD0=
 export _OSD1=
 export _OSD2=
+export _CLUSTER_NAME=
 export _NUM_REPLICAS=
