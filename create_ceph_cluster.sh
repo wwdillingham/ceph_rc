@@ -114,7 +114,7 @@ DEVPREFIX_OSD2=$(ssh -q -t $_OSD0 df -h / | grep -i dev | awk -F " " '{print $1}
 for i in `ssh $_OSD0 "lsblk --output KNAME | grep -i sd | grep -v vda | grep -v [0-9]"`; do OSDCOUNT_OSD0=$((OSDCOUNT_OSD0+1)); done #line needs to be generates per OSD host
 for i in `ssh $_OSD0 "lsblk --output KNAME | grep -i sd | grep -v vda | grep -v [0-9]"`; do OSDCOUNT_OSD1=$((OSDCOUNT_OSD1+1)); done #line needs to be generates per OSD host
 for i in `ssh $_OSD0 "lsblk --output KNAME | grep -i sd | grep -v vda | grep -v [0-9]"`; do OSDCOUNT_OSD2=$((OSDCOUNT_OSD2+1)); done #line needs to be generates per OSD host
-TOTALOSDCOUNT= $OSDCOUNT_OSD0 + $OSDCOUNT_OSD1 + $OSDCOUNT_OSD2 #This summation list is dynamically generated in the puppet template
+TOTALOSDCOUNT=$((OSDCOUNT_OSD0 + OSDCOUNT_OSD1 + OSDCOUNT_OSD2)) #This summation list is dynamically generated in the puppet template
 
 echo "Number of OSDs: $TOTALOSDCOUNT"
 echo "Number of Replicas: $_NUM_REPLICAS"
