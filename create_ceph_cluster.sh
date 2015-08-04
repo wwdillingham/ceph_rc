@@ -91,7 +91,8 @@ sudo systemctl start ntpd && sudo systemctl enable ntpd
 #####Mons
 
 #Deploy
-ceph-deploy new --cluster $_CLUSTER_NAME $_MON0 $_MON1 $_MON2 #initial monitor members
+#ceph-deploy --cluster $_CLUSTER_NAME new $_MON0 $_MON1 $_MON2 #custom cluster naming not supported on sysvinit hosts yet
+ceph-deploy new $_MON0 $_MON1 $_MON2 #initial monitor members
 
 #Install ceph
 ceph-deploy install $_MON0 $_MON1 $_MON2 $_MDS0 $_OSD0 $_OSD1 $_OSD2
