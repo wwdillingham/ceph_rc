@@ -22,8 +22,6 @@
 #This script expects that the target systems will have an OS installed, listening ssh server, 
 # On the OSD hosts that the disks will be raw and clean of any previous configuration.
 
-source source.sh
-
 #Functions:
 
 function getPowTwo() {
@@ -37,69 +35,50 @@ done
 PGNUM=$k
 }
 
-
-#end Functions
-
-sudo yum install -y ceph
-
-#Make This Directory owned by CEPH_ADMIN_USER
-sudo chown -R $CEPH_ADMIN_USER:$CEPH_ADMIN_USER /tmp/userdata_launchpad
-
+SCRIPTLOC=`readlink -f $0 | rev | cut -d "/" -f2- | rev`
 
 #Gather Hostkeys
-ssh-keyscan -H $_MON0 >> ~/.ssh/known_hosts
-ssh-keyscan -H $_MON1 >> ~/.ssh/known_hosts
-ssh-keyscan -H $_MON2 >> ~/.ssh/known_hosts
-ssh-keyscan -H $_MDS0 >> ~/.ssh/known_hosts
-ssh-keyscan -H $_OSD0 >> ~/.ssh/known_hosts
-ssh-keyscan -H $_OSD1 >> ~/.ssh/known_hosts
-ssh-keyscan -H $_OSD2 >> ~/.ssh/known_hosts
+<% for @mon in @mons -%>
+ssh-keyscan -H <%= @mon %> >> ~/.ssh/known_hosts
+<% end -%>
+<% for @mds in @mdss -%>
+ssh-keyscan -H <%= @mds %> >> ~/.ssh/known_hosts
+<% end -%>
+<% for @osd in @osds -%>
+ssh-keyscan -H <%= @osd %> >> ~/.ssh/known_hosts
+<% end -%>
 
 #Prepare Firewall
-ssh -t $_MON0 "sudo service firewalld stop"
-ssh -t $_MON1 "sudo service firewalld stop"
-ssh -t $_MON2 "sudo service firewalld stop"
-ssh -t $_MDS0 "sudo service firewalld stop"
-ssh -t $_OSD0 "sudo service firewalld stop"
-ssh -t $_OSD1 "sudo service firewalld stop"
-ssh -t $_OSD2 "sudo service firewalld stop"
-sudo service firewalld stop
+<% for @mon in @mons -%>
+ssh -t <%= @mon %> "sudo service firewalld stop"
+<% end -%>
+<% for @mds in @mdss -%>
+ssh -t <%= @mds %> "sudo service firewalld stop"
+<% end -%>
+<% for @osd in @osdss -%>
+ssh -t <%= @mon %> "sudo service firewalld stop"
+<% end -%>
+
 
 #disable requiretty
-ssh -t $_MON0 "sudo sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers"
-ssh -t $_MON1 "sudo sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers"
-ssh -t $_MON2 "sudo sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers"
-ssh -t $_MDS0 "sudo sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers"
-ssh -t $_OSD0 "sudo sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers"
-ssh -t $_OSD1 "sudo sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers"
-ssh -t $_OSD2 "sudo sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers"
+<% for @mon in @mons -%>
+ssh -t <%= @mon %> "sudo sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers"
+<% end -%>
+<% for @mds in @mdss -%>
+ssh -t <%= @mds %> "sudo sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers"
+<% end -%>
+<% for @osd in @osds -%>
+ssh -t <%= @osd %> "sudo sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers"
+<% end -%>
 sudo sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers
-
-#Start NTP
-rsync --rsync-path="sudo rsync" ntp.conf $_MON0:/etc/ntp.conf
-rsync --rsync-path="sudo rsync" ntp.conf $_MON1:/etc/ntp.conf
-rsync --rsync-path="sudo rsync" ntp.conf $_MON2:/etc/ntp.conf
-rsync --rsync-path="sudo rsync" ntp.conf $_MDS0:/etc/ntp.conf
-rsync --rsync-path="sudo rsync" ntp.conf $_OSD0:/etc/ntp.conf
-rsync --rsync-path="sudo rsync" ntp.conf $_OSD1:/etc/ntp.conf
-rsync --rsync-path="sudo rsync" ntp.conf $_OSD2:/etc/ntp.conf
-ssh -t $_MON0 "sudo systemctl start ntpd && sudo systemctl enable ntpd"
-ssh -t $_MON1 "sudo systemctl start ntpd && sudo systemctl enable ntpd"
-ssh -t $_MON2 "sudo systemctl start ntpd && sudo systemctl enable ntpd"
-ssh -t $_MDS0 "sudo systemctl start ntpd && sudo systemctl enable ntpd"
-ssh -t $_OSD0 "sudo systemctl start ntpd && sudo systemctl enable ntpd"
-ssh -t $_OSD1 "sudo systemctl start ntpd && sudo systemctl enable ntpd"
-ssh -t $_OSD2 "sudo systemctl start ntpd && sudo systemctl enable ntpd"
-sudo systemctl start ntpd && sudo systemctl enable ntpd
 
 
 #####Mons
 
 #Deploy
 #ceph-deploy --cluster $_CLUSTER_NAME new $_MON0 $_MON1 $_MON2 #custom cluster naming not supported on sysvinit hosts yet
-ceph-deploy new $_MON0 $_MON1 $_MON2 #initial monitor members
+ceph-deploy new <% @mons.join(' ') -%>
 #A ceph.conf a ceph.log and a mon keyring are now created withing the current working directory
-SCRIPTLOC=`readlink -f $0 | rev | cut -d "/" -f2- | rev`
 echo "osd pool default size = $_NUM_REPLICAS" >> $SCRIPTLOC/ceph.conf
 
 #need to determine where the root disk is, either /dev/vda1 or /dev/sda1 this is important because if root disk is at /dev/sda1 we should not attempt use it for ceph. We do this by adding in a grep -v when zapping, deploying, and activating
