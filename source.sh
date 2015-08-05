@@ -7,4 +7,4 @@ export _OSD1=
 export _OSD2=
 #export _CLUSTER_NAME= #custom cluster naming not supported on sysvinit hosts yet
 export _NUM_REPLICAS=
-export _INITIAL_POOL=
+export _INITIAL_POOLS=

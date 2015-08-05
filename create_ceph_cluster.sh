@@ -37,6 +37,11 @@ done
 PGNUM=$k
 }
 
+
+#end Functions
+
+sudo yum install -y ceph
+
 #Make This Directory owned by CEPH_ADMIN_USER
 sudo chown -R $CEPH_ADMIN_USER:$CEPH_ADMIN_USER /tmp/userdata_launchpad
 
@@ -183,7 +188,7 @@ for i in `ssh $_OSD2 "lsblk --output KNAME | grep -i sd | grep -v $DEVPREFIX_OSD
 #create pool as defined by _INITIAL_POOL in source.sh and set it to use the calculated amount of placement groups
 for pool in `echo $_INITIAL_POOLS | tr "," "\n"`
 do
-	ceph osd pool create $pool $PGNUM
+	ssh -t $_MON0 "sudo ceph osd pool create $pool $PGNUM"
 	sleep 20 #give pgs time to be created, this may need to be adjusted, or logic needs to be built in to wait till pg's are built
-        ceph osd pool set $pool pgp_num $PGNUM #this will cause rebalancing, but the cluster is empty, of course
+        ssh -t "sudo ceph osd pool set $pool pgp_num $PGNUM" #this will cause rebalancing, but the cluster is empty, of course
 done
