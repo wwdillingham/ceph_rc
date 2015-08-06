@@ -151,7 +151,7 @@ ceph-deploy gatherkeys <%= @mon_hosts[0] %> #check me
 
 #first zap the disks
 <% for @osd in @osd_hosts -%>
-for i in `ssh <%= @osd %> "lsblk --output KNAME | grep -i sd | grep -v $DEVPREFIX_<%= @osd.split(".")[0] %> | grep -v [0-9]"`; do ceph-deploy disk zap $<%= @osd %>:$i; done
+for i in `ssh <%= @osd %> "lsblk --output KNAME | grep -i sd | grep -v $DEVPREFIX_<%= @osd.split(".")[0] %> | grep -v [0-9]"`; do ceph-deploy disk zap <%= @osd %>:$i; done
 <% end -%>
 
 #Deploy the OSDs
