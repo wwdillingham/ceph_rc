@@ -41,7 +41,7 @@ SCRIPTLOC=`readlink -f $0 | rev | cut -d "/" -f2- | rev`
 <% for @mon in @mon_hosts -%>
 ssh-keyscan -H <%= @mon %> >> ~/.ssh/known_hosts
 <% end -%>
-<% for @mds in $mds_hosts -%>
+<% for @mds in @mds_hosts -%>
 ssh-keyscan -H <%= @mds %> >> ~/.ssh/known_hosts
 <% end -%>
 <% for @osd in @osd_hosts -%>
@@ -64,7 +64,7 @@ ssh -t <%= @mon %> "sudo service firewalld stop"
 <% for @mon in @mon_hosts -%>
 ssh -t <%= @mon %> "sudo sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers"
 <% end -%>
-<% for @mds in $mds_hosts -%>
+<% for @mds in @mds_hosts -%>
 ssh -t <%= @mds %> "sudo sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers"
 <% end -%>
 <% for @osd in @osd_hosts -%>
@@ -130,7 +130,7 @@ echo "osd pool default pg num = $PGNUM" >> $SCRIPTLOC/ceph.conf
 echo "osd pool default pgp num = $PGNUM" >> $SCRIPTLOC/ceph.conf
 
 #Install ceph
-ceph-deploy install <%= @mon_hosts.join(' ') -%> <%= $mds_hosts.join(' ') -%> <%= @osd_hosts.join(' ') -%> #check me
+ceph-deploy install <%= @mon_hosts.join(' ') -%> <%= @mds_hosts.join(' ') -%> <%= @osd_hosts.join(' ') -%> #check me
 
 #Copy Mon Keyring
 <% for @osd in @osd_hosts -%>
