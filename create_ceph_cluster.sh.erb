@@ -52,7 +52,7 @@ ssh-keyscan -H <%= @osd %> >> ~/.ssh/known_hosts
 <% for @mon in @mon_hosts -%>
 ssh -t <%= @mon %> "sudo service firewalld stop"
 <% end -%>
-<% for @mds in $mds_hosts -%>
+<% for @mds in @mds_hosts -%>
 ssh -t <%= @mds %> "sudo service firewalld stop"
 <% end -%>
 <% for @osd in @osd_hosts -%>
