@@ -83,7 +83,7 @@ echo "osd pool default size = <%= @name %>" >> $SCRIPTLOC/ceph.conf
 
 #need to determine where the root disk is, either /dev/vda1 or /dev/sda1 this is important because if root disk is at /dev/sda1 we should not attempt use it for ceph. We do this by adding in a grep -v when zapping, deploying, and activating
 <% for @osd in @osd_hosts -%>
-DEVPREFIX_<%= @osd.split(".")[0] %>=$(ssh -q -t <%= @osd %> df -h / | grep -i dev | awk -F " " '{print $1}'| awk -F "/" '{print $3}' | cut -c1,2,3 )
+DEVPREFIX_<%= @osd.tr('-','_').split(".")[0] %>=$(ssh -q -t <%= @osd %> df -h / | grep -i dev | awk -F " " '{print $1}'| awk -F "/" '{print $3}' | cut -c1,2,3 )
 <% end -%>
 
 #Need to determine The number of OSDs in the entire cluster, this is important for calculating the number of PGS
@@ -94,8 +94,9 @@ DEVPREFIX_<%= @osd.split(".")[0] %>=$(ssh -q -t <%= @osd %> df -h / | grep -i de
 #If you have more than 50 OSDs, Calculate using the following equation:
 #Total PGs = (OSDs * 100) / pool size
 #Where pool size is either the # of replicas for replicated pools or the K+M sum for erasure coded pools (as returned by ceph osd erasure code-profile get)
+
 <% for @osd in @osd_hosts -%>
-for i in `ssh <%= @osd %> "lsblk --output KNAME | grep -i sd | grep -v vda | grep -v [0-9]"`; do OSDCOUNT_<%= @osd.split(".")[0] %>=$((OSDCOUNT_<%= @osd.split(".")[0] %>+1)); done
+for i in `ssh <%= @osd.split(".")[0] %> "lsblk --output KNAME | grep -i sd | grep -v vda | grep -v [0-9]"`; do OSDCOUNT_<%= @osd.tr('-','_').split(".")[0] %>=$((OSDCOUNT_<%= @osd.tr('-','_').split(".")[0] %>+1)); done
 <% end -%>
 
 <% for @osd in @osd_hosts -%>
@@ -151,17 +152,17 @@ ceph-deploy gatherkeys <%= @mon_hosts[0] %> #check me
 
 #first zap the disks
 <% for @osd in @osd_hosts -%>
-for i in `ssh <%= @osd %> "lsblk --output KNAME | grep -i sd | grep -v $DEVPREFIX_<%= @osd.split(".")[0] %> | grep -v [0-9]"`; do ceph-deploy disk zap <%= @osd %>:$i; done
+for i in `ssh <%= @osd %> "lsblk --output KNAME | grep -i sd | grep -v $DEVPREFIX_<%= @osd.tr('-','_').split(".")[0] %> | grep -v [0-9]"`; do ceph-deploy disk zap <%= @osd %>:$i; done
 <% end -%>
 
 #Deploy the OSDs
 <% for @osd in @osd_hosts -%>
-for i in `ssh <%= @osd %> "lsblk --output KNAME | grep -i sd | grep -v $DEVPREFIX_<%= @osd.split(".")[0] %>"`; do ceph-deploy osd prepare $<%= @osd %>:$i:$i; done
+for i in `ssh <%= @osd %> "lsblk --output KNAME | grep -i sd | grep -v $DEVPREFIX_<%= @osd.tr('-','_').split(".")[0] %>"`; do ceph-deploy osd prepare $<%= @osd %>:$i:$i; done
 <% end -%>
 
 #Activate the OSDs
 <% for @osd in @osd_hosts -%>
-for i in `ssh <%= @osd %> "lsblk --output KNAME | grep -i sd | grep -v $DEVPREFIX_<%= @osd.split(".")[0] %> | grep 1"`; do ceph-deploy osd activate $<%= @osd %>:${i}; done
+for i in `ssh <%= @osd %> "lsblk --output KNAME | grep -i sd | grep -v $DEVPREFIX_<%= @osd.tr('-','_').split(".")[0] %> | grep 1"`; do ceph-deploy osd activate $<%= @osd %>:${i}; done
 <% end -%>
 #At this point the ceph-deploy is complete, 1 pool exists called "rbd" and it doesnt appear to be obeying the rules of placement groups defined in our ceph.conf
 
