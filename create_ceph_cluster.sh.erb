@@ -157,12 +157,12 @@ for i in `ssh <%= @osd %> "lsblk --output KNAME | grep -i sd | grep -v $DEVPREFI
 
 #Deploy the OSDs
 <% for @osd in @osd_hosts -%>
-for i in `ssh <%= @osd %> "lsblk --output KNAME | grep -i sd | grep -v $DEVPREFIX_<%= @osd.tr('-','_').split(".")[0] %>"`; do ceph-deploy osd prepare $<%= @osd %>:$i:$i; done
+for i in `ssh <%= @osd %> "lsblk --output KNAME | grep -i sd | grep -v $DEVPREFIX_<%= @osd.tr('-','_').split(".")[0] %>"`; do ceph-deploy osd prepare <%= @osd %>:$i:$i; done
 <% end -%>
 
 #Activate the OSDs
 <% for @osd in @osd_hosts -%>
-for i in `ssh <%= @osd %> "lsblk --output KNAME | grep -i sd | grep -v $DEVPREFIX_<%= @osd.tr('-','_').split(".")[0] %> | grep 1"`; do ceph-deploy osd activate $<%= @osd %>:${i}; done
+for i in `ssh <%= @osd %> "lsblk --output KNAME | grep -i sd | grep -v $DEVPREFIX_<%= @osd.tr('-','_').split(".")[0] %> | grep 1"`; do ceph-deploy osd activate <%= @osd %>:${i}; done
 <% end -%>
 #At this point the ceph-deploy is complete, 1 pool exists called "rbd" and it doesnt appear to be obeying the rules of placement groups defined in our ceph.conf
 
