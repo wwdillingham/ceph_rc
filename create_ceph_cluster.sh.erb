@@ -170,7 +170,7 @@ for i in `ssh <%= @osd %> "lsblk --output KNAME | grep -i sd | grep -v $DEVPREFI
 #create pool as defined by _INITIAL_POOL in source.sh and set it to use the calculated amount of placement groups
 for pool in <%= @pools.join(" ") %>
 do
-	ssh -t $_MON0 "sudo ceph osd pool create $pool $PGNUM"
+	ssh -t <%= @mon_hosts[0] %> "sudo ceph osd pool create $pool $PGNUM"
 	sleep 20 #give pgs time to be created, this may need to be adjusted, or logic needs to be built in to wait till pg's are built
 	ssh -t "sudo ceph osd pool set $pool pgp_num $PGNUM" #this will cause rebalancing, but the cluster is empty, of course
 done
