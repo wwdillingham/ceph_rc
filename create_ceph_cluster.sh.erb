@@ -37,6 +37,44 @@ PGNUM=$k
 
 SCRIPTLOC=`readlink -f $0 | rev | cut -d "/" -f2- | rev`
 
+
+#This script needs to be run by the ceph-deployment user or it wont work
+#Passwordless sudo, ssh-keys, and no tty requirements are the reason for this
+#and are all handled by puppet for that user on hosts defined in hiera to be in this cluster
+
+if [[ `id -u` != <%= @user_id %> ]]; then
+    echo "Must be <%= @user %> to run script"
+    exit 1
+fi
+
+#Count the number of OSD hosts:
+<% for @osd in @osd_hosts -%>
+NUMBER_OF_OSD_HOSTS=$((NUMBER_OF_OSD_HOSTS+1))
+<% end -%>
+
+#The number of replicas cannot exceed the number of OSD hosts, this will overrride the value provided by
+#Heira if the request # of replicas is 
+if [[ $NUMBER_OF_OSD_HOSTS -le 2 ]];
+then
+  clear
+  echo "The number of replicas specified in heira cannot be acheived with the number of OSD hosts specified"
+  echo "will lower the number of replicas in order to proceed - # of replicas can be manually changed"
+  echo "after the cluster is built and more OSD hosts are added to the cluster."
+  echo "This cluster can proced with $NUMBER_OF_OSD_HOSTS Replicas"
+  echo "Do you wish to Proceed with deployment? [Y/N]"
+  read PROCEED
+  if [[ $PROCEED == "y" || $PROCEED == "Y" ]]; then
+    echo "Proceeding with deployment"
+    REPLICA_SIZE=$NUMBER_OF_OSD_HOSTS
+  else
+    echo "Exiting deployment"
+    exit
+  fi
+else
+  REPLICA_SIZE=<%= @numreplicas %> #Heira definition
+fi
+
+
 #Gather Hostkeys
 <% for @mon in @mon_hosts -%>
 ssh-keyscan -H <%= @mon %> >> ~/.ssh/known_hosts
@@ -48,42 +86,18 @@ ssh-keyscan -H <%= @mds %> >> ~/.ssh/known_hosts
 ssh-keyscan -H <%= @osd %> >> ~/.ssh/known_hosts
 <% end -%>
 
-#Prepare Firewall
-<% for @mon in @mon_hosts -%>
-ssh -t <%= @mon %> "sudo service firewalld stop"
-<% end -%>
-<% for @mds in @mds_hosts -%>
-ssh -t <%= @mds %> "sudo service firewalld stop"
-<% end -%>
-<% for @osd in @osd_hosts -%>
-ssh -t <%= @mon %> "sudo service firewalld stop"
-<% end -%>
-
-
-#disable requiretty
-<% for @mon in @mon_hosts -%>
-ssh -t <%= @mon %> "sudo sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers"
-<% end -%>
-<% for @mds in @mds_hosts -%>
-ssh -t <%= @mds %> "sudo sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers"
-<% end -%>
-<% for @osd in @osd_hosts -%>
-ssh -t <%= @osd %> "sudo sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers"
-<% end -%>
-sudo sed -i 's/^Defaults    requiretty/Defaults:ceph !requiretty/' /etc/sudoers
-
-
 #####Mons
 
 #Deploy
 #ceph-deploy --cluster $_CLUSTER_NAME new $_MON0 $_MON1 $_MON2 #custom cluster naming not supported on sysvinit hosts yet
 ceph-deploy new <%= @mon_hosts.join(" ") -%> #check me
 #A ceph.conf a ceph.log and a mon keyring are now created withing the current working directory
-echo "osd pool default size = <%= @name %>" >> $SCRIPTLOC/ceph.conf
+echo "osd pool default size = $REPLICA_SIZE" >> $SCRIPTLOC/ceph.conf
 
 #need to determine where the root disk is, either /dev/vda1 or /dev/sda1 this is important because if root disk is at /dev/sda1 we should not attempt use it for ceph. We do this by adding in a grep -v when zapping, deploying, and activating
 <% for @osd in @osd_hosts -%>
-DEVPREFIX_<%= @osd.tr('-','_').split(".")[0] %>=$(ssh -q -t <%= @osd %> df -h / | grep -i dev | awk -F " " '{print $1}'| awk -F "/" '{print $3}' | cut -c1,2,3 )
+ROOT_BLOCK_DEVICE_<%= @osd.tr('-','_').split(".")[0] %>=$(ssh -q -t <%= @osd %> sudo /usr/sbin/pvscan | grep -i root | awk -F " " '{print $2}' | awk -F "/" '{print $3}' | cut -c1,2,3 )
+ROOT_BLOCK_DEVICE_PREFIX_<%= @osd.tr('-','_').split(".")[0] %>=$(ssh -q -t <%= @osd %> sudo /usr/sbin/pvscan | grep -i root | awk -F " " '{print $2}' | awk -F "/" '{print $3}' | cut -c1,2 )
 <% end -%>
 
 #Need to determine The number of OSDs in the entire cluster, this is important for calculating the number of PGS
@@ -95,19 +109,25 @@ DEVPREFIX_<%= @osd.tr('-','_').split(".")[0] %>=$(ssh -q -t <%= @osd %> df -h / 
 #Total PGs = (OSDs * 100) / pool size
 #Where pool size is either the # of replicas for replicated pools or the K+M sum for erasure coded pools (as returned by ceph osd erasure code-profile get)
 
+#need to refactor to autodetermine sd / vd etc
+#Counting block devices that are able to be OSDs
 <% for @osd in @osd_hosts -%>
-for i in `ssh <%= @osd.split(".")[0] %> "lsblk --output KNAME | grep -i sd | grep -v vda | grep -v [0-9]"`; do OSDCOUNT_<%= @osd.tr('-','_').split(".")[0] %>=$((OSDCOUNT_<%= @osd.tr('-','_').split(".")[0] %>+1)); done
+for i in `ssh <%= @osd.split(".")[0] %> "lsblk --output KNAME | grep -i $ROOT_BLOCK_DEVICE_PREFIX_<%= @osd.tr('-','_').split(".")[0] %> | grep -v sda | grep -v vda | grep -v [0-9]"`; do OSDCOUNT_<%= @osd.tr('-','_').split(".")[0] %>=$((OSDCOUNT_<%= @osd.tr('-','_').split(".")[0] %>+1)); done
 <% end -%>
 
 <% for @osd in @osd_hosts -%>
-TOTALOSDCOUNT=$((TOTALOSDCOUNT + OSDCOUNT_<%= @osd.split(".")[0] %>))
+TOTALOSDCOUNT=$((TOTALOSDCOUNT + OSDCOUNT_<%= @osd.tr('-','_').split(".")[0] %>))
 <% end -%>
 
 echo "Number of OSDs: $TOTALOSDCOUNT"
 echo "Number of Replicas: <%= @numreplicas %>"
 
 #implement logic to set number of placement groups  appropriately
-if [ $TOTALOSDCOUNT -le 5 ];
+if [[ $TOTALOSDCOUNT == 0 ]];
+then
+  echo "Error VARIABLE:TOTALOSDCOUNT (total number of osds in this cluster) is zero and that is not a valid number"
+  exit 1
+elif [[ $TOTALOSDCOUNT -ge 1 && $TOTALOSDCOUNT -le 5 ]];
 then
         PGNUM=128
 elif [[ $TOTALOSDCOUNT -gt 5 && $TOTALOSDCOUNT -le 10 ]];
@@ -118,20 +138,27 @@ then
         PGNUM=4096
 elif [ $TOTALOSDCOUNT -gt 61 ];
 then
-        TEMP_PGNUM=$((TOTALOSDCOUNT * 100  / <%= @numreplicas %>)) #check me
+        TEMP_PGNUM=$((TOTALOSDCOUNT * 100  / $REPLICA_SIZE)) #check me
         getPowTwo "$TEMP_PGNUM"
 else
         echo "ERROR variable:TOTALOSDCOUNT (total number of osds in this cluster) is not a usable number, cannot determine # of PGs based on its value: $TOTALOSDCOUNT"
+        exit 1
 fi
 
-echo "PGNUM is $PGNUM"
+echo "Total # of PGS for the cluster is $PGNUM"
+
+#Now determine the per-pool placement group number
+NUMBER_OF_POOLS=1 #start at 1 as pool "rbd" exists, a default pool in ceph
+for pool in <%= @pools.join(" ") %>
+do
+  NUMBER_OF_POOLS=$((NUMBER_OF_POOLS+1))
+done
+PGS_PER_POOL=$((PGNUM / NUMBER_OF_POOLS))
+
 
 #need to modify ceph.conf to use calculated pg and pgp
-echo "osd pool default pg num = $PGNUM" >> $SCRIPTLOC/ceph.conf
-echo "osd pool default pgp num = $PGNUM" >> $SCRIPTLOC/ceph.conf
-
-#Install ceph
-ceph-deploy install <%= @mon_hosts.join(' ') -%> <%= @mds_hosts.join(' ') -%> <%= @osd_hosts.join(' ') -%> #check me
+echo "osd pool default pg num = $PGS_PER_POOL" >> $SCRIPTLOC/ceph.conf
+echo "osd pool default pgp num = $PGS_PER_POOL" >> $SCRIPTLOC/ceph.conf
 
 #Copy Mon Keyring
 <% for @osd in @osd_hosts -%>
@@ -149,29 +176,35 @@ ceph-deploy gatherkeys <%= @mon_hosts[0] %> #check me
 
 #####OSDs
 
-
-#first zap the disks
-<% for @osd in @osd_hosts -%>
-for i in `ssh <%= @osd %> "lsblk --output KNAME | grep -i sd | grep -v $DEVPREFIX_<%= @osd.tr('-','_').split(".")[0] %> | grep -v [0-9]"`; do ceph-deploy disk zap <%= @osd %>:$i; done
-<% end -%>
-
 #Deploy the OSDs
 <% for @osd in @osd_hosts -%>
-for i in `ssh <%= @osd %> "lsblk --output KNAME | grep -i sd | grep -v $DEVPREFIX_<%= @osd.tr('-','_').split(".")[0] %>"`; do ceph-deploy osd prepare <%= @osd %>:$i:$i; done
+for i in `ssh <%= @osd %> "lsblk --output KNAME | grep -i sd | grep -v $ROOT_BLOCK_DEVICE_<%= @osd.tr('-','_').split(".")[0] %>"`; do ceph-deploy osd prepare --fs-type <%= @osd_filesystem %> <%= @osd %>:$i:$i; done
 <% end -%>
 
 #Activate the OSDs
 <% for @osd in @osd_hosts -%>
-for i in `ssh <%= @osd %> "lsblk --output KNAME | grep -i sd | grep -v $DEVPREFIX_<%= @osd.tr('-','_').split(".")[0] %> | grep 1"`; do ceph-deploy osd activate <%= @osd %>:${i}; done
+for i in `ssh <%= @osd %> "lsblk --output KNAME | grep -i sd | grep -v $ROOT_BLOCK_DEVICE_<%= @osd.tr('-','_').split(".")[0] %> | grep 1"`; do ceph-deploy osd activate <%= @osd %>:${i}; done
 <% end -%>
-#At this point the ceph-deploy is complete, 1 pool exists called "rbd" and it doesnt appear to be obeying the rules of placement groups defined in our ceph.conf
+#At this point the ceph-deploy is complete
+
+#Determine the numer of pools to be created
 
 
-#create pool as defined by _INITIAL_POOL in source.sh and set it to use the calculated amount of placement groups
+
+#create pools as defined in heria
+#need to refactor to not use sleep but determine when pg's are created
 for pool in <%= @pools.join(" ") %>
 do
-	ssh -t <%= @mon_hosts[0] %> "sudo ceph osd pool create $pool $PGNUM"
-	echo "going to sleep for 20 seconds to get the cluster time to create the placement groups for pool $pool"
-	sleep 20 #give pgs time to be created, this may need to be adjusted, or logic needs to be built in to wait till pg's are built
-	ssh -t <%= @mon_hosts[0] %> "sudo ceph osd pool set $pool pgp_num $PGNUM" #this will cause rebalancing, but the cluster is empty, of course
+	ssh -t <%= @mon_hosts[0] %> "sudo ceph osd pool create $pool $PGS_PER_POOL"
+	echo "going to sleep for 3 minutes to give the cluster time to create the placement groups for pool: $pool"
+	sleep 180 #give pgs time to be created, this may need to be adjusted, or logic needs to be built in to wait till pg's are built
+	ssh -t <%= @mon_hosts[0] %> "sudo ceph osd pool set $pool pgp_num $PGS_PER_POOL" #this will cause rebalancing, but the cluster is empty, of course
 done
+
+
+#Restart osd daemons on osd hosts (one per OSD)
+<% for @osd in @osd_hosts -%>
+ssh -t <%= @osd %> "sudo /usr/sbin/service ceph restart"
+echo "sleeping for 1 minute to give daemons on <%= @osd %> to restart "
+sleep 60
+<% end -%>
