@@ -27,6 +27,7 @@ do
 	FILESYSTEM=`echo $i | cut -f3 -d " "`
 	echo "filesystem type is $FILESYSTEM"
 	MOUNTOPTIONS=`echo $i | cut -f4 -d " "`
+        MOUNTOPTIONS=${MOUNTOPTIONS},_netdev
 	echo "mount options are $MOUNTOPTIONS"
 	DUMP=`echo $i | cut -f5 -d " "`
 	echo "The dump is $DUMP"
