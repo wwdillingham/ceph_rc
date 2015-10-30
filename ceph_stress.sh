@@ -34,10 +34,14 @@ function print_help() {
         echo "--block_size=integer block size to use for write [required]"
         echo "--time=integer Time to sustain test. In progress write operations will continue, none  [required]"
         echo "--pool=string pool name to use, will create if non-existent but will not remove pool [required]"
-        echo "--replication_size number of replicas to make [required for non-existent pools, not allowed for existing pools]"
+        echo "--replication_size number of replicas to make [required for non-existent pools, ignored for existing pools]"
 	echo "----------------------------------------------"
 	echo "--rbd_bonnie options:"
 	echo "--rbd_bonnie expects"
+}
+
+function does_pool_exist() {
+
 }
 
 function set_pg_num() {
@@ -82,9 +86,27 @@ function rbd_bonnie() {
  }
 
 function check_input_args_for_rbd_dd() {
- #Loop through the args
-#argument 
+ for arg in "$@"
+ do
+	KEY=`echo $arg | awk -F "=" '{print $1}'`
+        VALUE=`echo $arg | awk -F "=" '{print $2}'`
+	#Check if there is a flag that shouldnt be there
+	if [[ $KEY != "--num_block_devices" && $KEY != "--block_device_size" && $KEY != "--block_size" && $KEY != "--time" && $KEY != "-pool" && $KEY != "--replication_size" ]]; then
+		echo "$arg is not a valid parameter"
+		print_help
+		exit
+	fi 
+	
+ done
+
+ NUM_BLOCK_DEVICE=$1
+ SIZE_BLOCK_DEVICE=$2
+ BLOCK_SIZE_IN_MB=$3
+ TEST_TIME_IN_SEC=$4
+ POOL_NAME=$5
+ REPLICATION_SIZE=$6	
 }
+
 
 function check_input_args_for_rbd_bonnie() {
 }
@@ -106,13 +128,13 @@ echo "dollar sign 2: $2"
 
 if [[ $1 == "--help" ]] 
 	print_help
-elif [[  $1 -ne "--rbd_dd" && $1 -ne "--rados_bench" && $1 -ne "--rbd_benchwrite" &&  ]]; then
+elif [[  $1 -ne "--rbd_dd" && $1 -ne "--rados_bench" && $1 -ne "--rbd_benchwrite" &&  $1 -ne "rbn_bonnie"]]; then
 	echo "Invalid first option - printing help:"
         print_help
 elif [[ $1 == "--rbd_dd" ]]
 	echo "Performing rbd mounts and doing a dd" 
 	if [[ $# -eq 5 || $# -eq 6 ]]; then #the correct number of args
-	  check_input_args_for_rbd_dd($2,$3,$4,$5,$6,$7) 
+	  check_input_args_for_rbd_dd $2 $3 $4 $5 $6 $7 
 	else
 	  echo "Wrong number of arguments received for rbd_dd"
 	  print_help
