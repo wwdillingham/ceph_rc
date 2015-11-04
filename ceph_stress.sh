@@ -28,16 +28,27 @@ function print_help() {
 	echo "This utility has 4 modes"
         echo "Usage:   --rbd_dd [options]   or   --rbd_bonnie [options]   or   --rados_bench [options]    or   --rbd_benchwrite [options]"
         echo "Note either --rbd_dd or --rbd_bonnie or --rados_bench or --rbd_benchwrite must be passed as the first argument (order matters)"
+        echo "----------------------------------------------"
         echo "--rbd_dd options:"
         echo "--num_block_devices=integer [required]"
         echo "--block_device_size=integer size in MB [required]"
         echo "--block_size=integer block size to use for write [required]"
         echo "--time=integer Time to sustain test. In progress write operations will continue, none  [required]"
         echo "--pool=string pool name to use, will create if non-existent but will not remove pool [required]"
-        echo "--replication_size number of replicas to make [required for non-existent pools, ignored for existing pools]"
-	echo "----------------------------------------------"
-	echo "--rbd_bonnie options:"
-	echo "--rbd_bonnie expects"
+        echo "--replication_size=integer number of replicas to make [required for non-existent pools, ignored for existing pools]"
+        echo "----------------------------------------------"
+	      echo "--rbd_bonnie options:"
+        echo "--bonnie-string=\"string\" enclose bonnie++ options to run in parentheses [required]"
+        echo "--pool=string pool name to use, will create if non-existent but will not remove pool [required]"
+        echo "--replication_size  number of replicas to make [required for non-existent pools, ignored for existing pools]"
+        echo "----------------------------------------------"
+        echo "--rados_bench options:"
+        echo "--time=integer Time to sustain test. In progress write operations will continue till completion [required]" 
+        echo "--mode=[write,seq,rand] write mode to test ....., sequential writes, random writes [required]"
+        echo "--ops=integer number of concurrent rados operations per client[required]"
+        echo "--pool=string pool name to use, will create if non-existent but will not remove pool [required]"
+        echo "--replication_size=integer number of replicas to make [required for non-existent pools, ignored for existing pools]"
+        echo "--rbd_benchwrite options:"
 }
 
 function does_pool_exist() {
@@ -86,25 +97,32 @@ function rbd_bonnie() {
  }
 
 function check_input_args_for_rbd_dd() {
+  #At this point the first arg has been stripped off of the parameter list.
  for arg in "$@"
  do
 	KEY=`echo $arg | awk -F "=" '{print $1}'`
-        VALUE=`echo $arg | awk -F "=" '{print $2}'`
+  VALUE=`echo $arg | awk -F "=" '{print $2}'`
 	#Check if there is a flag that shouldnt be there
 	if [[ $KEY != "--num_block_devices" && $KEY != "--block_device_size" && $KEY != "--block_size" && $KEY != "--time" && $KEY != "-pool" && $KEY != "--replication_size" ]]; then
-		echo "$arg is not a valid parameter"
+		echo "ERROR: $arg is not a valid parameter"
 		print_help
 		exit
-	fi 
-	
- done
-
- NUM_BLOCK_DEVICE=$1
- SIZE_BLOCK_DEVICE=$2
- BLOCK_SIZE_IN_MB=$3
- TEST_TIME_IN_SEC=$4
- POOL_NAME=$5
- REPLICATION_SIZE=$6	
+	fi
+  if [[ $KEY == "--num_block_devices" ]]; then
+    NUM_BLOCK_DEVICE=$arg
+  elif [[ $KEY == "--block_device_size" ]]
+    SIZE_BLOCK_DEVICE=$arg
+  elif [[ $KEY == "--block_size" ]]
+    BLOCK_SIZE_IN_MB=$arg
+  elif [[ $KEY == "--time" ]]
+    TEST_TIME_IN_SEC=$arg
+  elif [[ $KEY == "--pool" ]]
+    POOL_NAM=$arg
+  elif [[ $KEY == "--replication_size"]]
+    REPLICATION_SIZE=$arg
+  fi
+    
+    
 }
 
 
@@ -129,7 +147,7 @@ echo "dollar sign 2: $2"
 if [[ $1 == "--help" ]] 
 	print_help
 elif [[  $1 -ne "--rbd_dd" && $1 -ne "--rados_bench" && $1 -ne "--rbd_benchwrite" &&  $1 -ne "rbn_bonnie"]]; then
-	echo "Invalid first option - printing help:"
+	echo "ERROR: Invalid first option"
         print_help
 elif [[ $1 == "--rbd_dd" ]]
 	echo "Performing rbd mounts and doing a dd" 
