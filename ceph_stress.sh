@@ -14,7 +14,7 @@
 
 
 #Purpose 
-#This script is intended to stess test a ceph cluster
+#This script is intended to stess test a ceph cluster it 
 
 #I know who I am, do you know who you are?
 if [[ `id -u` != 0 ]]; then
@@ -98,8 +98,8 @@ function rbd_bonnie() {
 
 function check_input_args_for_rbd_dd() {
   #At this point the first arg has been stripped off of the parameter list.
- for arg in "$@"
- do
+for arg in "$@"
+do
 	KEY=`echo $arg | awk -F "=" '{print $1}'`
   VALUE=`echo $arg | awk -F "=" '{print $2}'`
 	#Check if there is a flag that shouldnt be there
@@ -117,10 +117,39 @@ function check_input_args_for_rbd_dd() {
   elif [[ $KEY == "--time" ]]
     TEST_TIME_IN_SEC=$arg
   elif [[ $KEY == "--pool" ]]
-    POOL_NAM=$arg
+    POOL_NAME=$arg
   elif [[ $KEY == "--replication_size"]]
     REPLICATION_SIZE=$arg
   fi
+done
+
+if ! [[ $NUM_BLOCK_DEVICE =~ ^[1-9]+$ ]]; then
+            echo "ERROR: --num_block_devices must be a positive integer"
+            print_help
+            exit
+fi
+if ! [[ $SIZE_BLOCK_DEVICE =~ ^[1-9]+$ ]]; then
+            echo "ERROR: --block_device_size must be a positive integer"
+            print_help
+            exit
+fi
+if ! [[ $BLOCK_SIZE_IN_MB =~ ^[1-9]+$ ]]; then
+            echo "ERROR: --block_size must be a positive integer"
+            print_help
+            exit
+fi
+if ! [[ $TEST_TIME_IN_SEC =~ ^[1-9]+$ ]]; then
+            echo "ERROR: --time must be a positive integer"
+            print_help
+            exit
+fi
+if ! [[ $REPLICATION_SIZE =~ ^[1-9]+$ ]]; then
+            echo "ERROR: --replication_size must be a positive integer"
+            print_help
+            exit
+fi
+
+
     
     
 }
