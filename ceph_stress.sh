@@ -36,11 +36,13 @@ function print_help() {
         echo "--time=integer Time to sustain test. In progress write operations will continue, none  [required]"
         echo "--pool=string pool name to use, will create if non-existent but will not remove pool [required]"
         echo "--replication_size=integer number of replicas to make [required for non-existent pools, ignored for existing pools]"
+        echo "--pg_num=integer number of placement groups for the pool [required for non-existent pools, ignored for existing pools]"
         echo "----------------------------------------------"
 	      echo "--rbd_bonnie options:"
         echo "--bonnie-string=\"string\" enclose bonnie++ options to run in parentheses [required]"
         echo "--pool=string pool name to use, will create if non-existent but will not remove pool [required]"
         echo "--replication_size  number of replicas to make [required for non-existent pools, ignored for existing pools]"
+        echo "--pg_num=integer number of placement groups for the pool [required for non-existent pools, ignored for existing pools]"
         echo "----------------------------------------------"
         echo "--rados_bench options:"
         echo "--time=integer Time to sustain test. In progress write operations will continue till completion [required]" 
@@ -48,22 +50,21 @@ function print_help() {
         echo "--ops=integer number of concurrent rados operations per client[required]"
         echo "--pool=string pool name to use, will create if non-existent but will not remove pool [required]"
         echo "--replication_size=integer number of replicas to make [required for non-existent pools, ignored for existing pools]"
+        echo "--pg_num=integer number of placement groups for the pool [required for non-existent pools, ignored for existing pools]"
         echo "--rbd_benchwrite options:"
 }
 
-function does_pool_exist() {
-
+function check_create_pool() {
+  if [[ `ceph osd lspools | grep -i "$1" | wc -l` == 0 ]]; then
+    echo "Creating Pool: $1"
+    rados mkpool $1
+    ceph osd pool $1 set pg_num $2 
+    ceph osd pool $1 set pgp_num $2
+  else
+    echo "That pool already exists - will use it for testing"
+  fi
 }
 
-function set_pg_num() {
-  POOL=$1
-  PGS=$2
-  #verify numnber of PGS 
-}
-
-function create_pool() {  
-  rados mkpool $1
-}
 
 function rbd_dd() {
  NUM_BLOCK_DEVICE=$1
@@ -120,6 +121,8 @@ do
     POOL_NAME=$arg
   elif [[ $KEY == "--replication_size"]]
     REPLICATION_SIZE=$arg
+  elif [[ $KEY == "--pg_num" ]]
+    PG_NUM=$arg
   fi
 done
 
@@ -143,15 +146,22 @@ if ! [[ $TEST_TIME_IN_SEC =~ ^[1-9]+$ ]]; then
             print_help
             exit
 fi
-if ! [[ $REPLICATION_SIZE =~ ^[1-9]+$ ]]; then
-            echo "ERROR: --replication_size must be a positive integer"
+if ! [[ $REPLICATION_SIZE =~ ^[2-9]+$ ]]; then
+            echo "ERROR: --replication_size must be a positive integer greater than 2"
             print_help
             exit
 fi
 
+if ! [[ $POOL_NAME =~ ^[0-9A-Za-z_]+$ ]]; then
+            echo  "ERROR: --pool must be alphanumberic, including underscores, no spaces"
+            print_help
+            exit
+fi
 
-    
-    
+if ! [ -z $POOL_NAME ]; then #if pool is defined, then lets try to create it
+  check_create_pool $POOL_NAME $PG_NUM
+
+
 }
 
 
@@ -180,8 +190,8 @@ elif [[  $1 -ne "--rbd_dd" && $1 -ne "--rados_bench" && $1 -ne "--rbd_benchwrite
         print_help
 elif [[ $1 == "--rbd_dd" ]]
 	echo "Performing rbd mounts and doing a dd" 
-	if [[ $# -eq 5 || $# -eq 6 ]]; then #the correct number of args
-	  check_input_args_for_rbd_dd $2 $3 $4 $5 $6 $7 
+	if [[ $# -eq 6 || $# -eq 8 ]]; then #the correct number of args
+	  check_input_args_for_rbd_dd $2 $3 $4 $5 $6 $7 $8 
 	else
 	  echo "Wrong number of arguments received for rbd_dd"
 	  print_help
