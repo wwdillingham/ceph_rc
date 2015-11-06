@@ -1,4 +1,8 @@
 #!/bin/bash
+#Wes Dillingham
+#wes_dillingham@harvard.edu
+
+#based off work by scuttlemonkey and rapide.nl https://ceph.com/dev-notes/incremental-snapshots-with-rbd/
 
 SOURCEPOOL="my-sourcepool"
 DESTPOOL="my-destpool"
