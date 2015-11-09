@@ -198,6 +198,7 @@ fi
   elif [[ $key == "--bonnie_string" ]]
     BONNIE_STRING=$VALUE
   fi
+  
 
 done  
   
@@ -222,10 +223,75 @@ if ! [[ $POOL_NAME =~ ^[0-9A-Za-z_]+$ ]]; then
   print_help
   exit
 fi
+if ! [[ $PG_NUM =~ ^[2-9]+$ ]]; then
+  echo  "ERROR: --pg_num must be a positive integer greater than 2"
+  print_help
+  exit
+fi
   
 }
 
 function check_input_args_for_rados_bench() {
+  #At this point the first arg has been stripped off of the parameter list.
+  for arg in "$@"
+  do
+  	KEY=`echo $arg | awk -F "=" '{print $1}'`
+    VALUE=`echo $arg | awk -F "=" '{print $2}'`
+
+  	#Check if there is a flag that shouldnt be there
+    if [[ $KEY != "--time" && $KEY != "--mode" && $KEY != "--ops" && $KEY != "--pool" && $KEY != "--replication_size" && $KEY != "--pg_num" ]]; then
+      echo "ERROR: $arg is not a valid parameter"
+      print_help
+      exit
+    fi
+    
+    if [[ $KEY == "--time" ]]; then
+      TEST_TIME_IN_SEC=$VALUE
+    elif [[ $KEY == "--mode" ]]
+      MODE=$VALUE
+    elif [[ $KEY == "--ops" ]]
+      OPS=$VALUE
+    elif [[ $KEY == "--pool" ]]
+      POOL_NAME=$VALUE
+    elif [[ $KEY == "--replication_size" ]]
+      REPLICATION_SIZE=$VALUE
+    elif [[ $key == "--pg_num" ]]
+      PG_NUM=$VALUE
+    fi
+  done
+
+  if ! [[ $REPLICATION_SIZE =~ ^[2-9]+$ ]]; then
+    echo "ERROR: --replication_size must be a positive integer greater than 2"
+    print_help
+    exit
+  fi
+  if ! [[ $POOL_NAME =~ ^[0-9A-Za-z_]+$ ]]; then
+    echo  "ERROR: --pool must be alphanumberic, including underscores, no spaces"
+    print_help
+    exit
+  fi
+  if ! [[ $PG_NUM =~ ^[2-9]+$ ]]; then
+    echo  "ERROR: --pg_num must be a positive integer greater than 2"
+    print_help
+    exit
+  fi
+  if ! [[ $MODE == "seq" || $MODE == "write" || $MODE == "rand"]]; then
+    echo "ERROR: --mode can either be seq, write, or rand"
+    print_help
+    exit
+  fi
+  if ! [[ $ops =~ ^[1-9]+$ ]]; then
+    echo "ERROR --ops must be a positive integer"
+    print_help
+    exit
+  fi
+  if ! [[ $TEST_TIME_IN_SEC =~ ^[1-9]+$ ]]; then
+    echo "ERROR: --time must be a positive integer"
+    print_help
+    exit
+  fi
+  
+
 }
 
 function check_input_args_for_rbd_benchwrite() {
@@ -266,6 +332,14 @@ elif [[ $1 == "--rbd_bonnie" ]]
   fi 
 elif [[ $1 == "-rados_bench" ]]
 	echo "Engaging rados bench utility"
+  if [[ $# -eq 5 || $# -eq 7 ]]; then
+    echo "Performing rados bench operation"
+    check_input_args_for_rados_bench $2 $3 $4 $5 $6 $7
+  else
+    echo "Wrong number of arguments received for --rados_bench"
+    print_help
+    exit
+  fi
 	rados_bench
 elif [[ $1 == "--rbd_benchwrite" ]]
 	echo "Engaging rbd bench-write system"
