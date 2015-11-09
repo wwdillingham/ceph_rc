@@ -58,8 +58,8 @@ function check_create_pool() {
   if [[ `ceph osd lspools | grep -i "$1" | wc -l` == 0 ]]; then
     echo "Creating Pool: $1"
     rados mkpool $1
-    ceph osd pool $1 set pg_num $2 
-    ceph osd pool $1 set pgp_num $2
+    ceph osd pool set $1 pg_num $2 
+    ceph osd pool set $1 pgp_num $2
   else
     echo "That pool already exists - will use it for testing"
   fi
@@ -110,19 +110,19 @@ do
 		exit
 	fi
   if [[ $KEY == "--num_block_devices" ]]; then
-    NUM_BLOCK_DEVICE=$arg
+    NUM_BLOCK_DEVICE=$VALUE
   elif [[ $KEY == "--block_device_size" ]]
-    SIZE_BLOCK_DEVICE=$arg
+    SIZE_BLOCK_DEVICE=$VALUE
   elif [[ $KEY == "--block_size" ]]
-    BLOCK_SIZE_IN_MB=$arg
+    BLOCK_SIZE_IN_MB=$VALUE
   elif [[ $KEY == "--time" ]]
-    TEST_TIME_IN_SEC=$arg
+    TEST_TIME_IN_SEC=$VALUE
   elif [[ $KEY == "--pool" ]]
-    POOL_NAME=$arg
+    POOL_NAME=$VALUE
   elif [[ $KEY == "--replication_size"]]
-    REPLICATION_SIZE=$arg
+    REPLICATION_SIZE=$VALUE
   elif [[ $KEY == "--pg_num" ]]
-    PG_NUM=$arg
+    PG_NUM=$VALUE
   fi
 done
 
@@ -132,35 +132,39 @@ if ! [[ $NUM_BLOCK_DEVICE =~ ^[1-9]+$ ]]; then
             exit
 fi
 if ! [[ $SIZE_BLOCK_DEVICE =~ ^[1-9]+$ ]]; then
-            echo "ERROR: --block_device_size must be a positive integer"
-            print_help
-            exit
+  echo "ERROR: --block_device_size must be a positive integer"
+  print_help
+  exit
 fi
 if ! [[ $BLOCK_SIZE_IN_MB =~ ^[1-9]+$ ]]; then
-            echo "ERROR: --block_size must be a positive integer"
-            print_help
-            exit
+  echo "ERROR: --block_size must be a positive integer"
+  print_help
+  exit
 fi
 if ! [[ $TEST_TIME_IN_SEC =~ ^[1-9]+$ ]]; then
-            echo "ERROR: --time must be a positive integer"
-            print_help
-            exit
+  echo "ERROR: --time must be a positive integer"
+  print_help
+  exit
 fi
 if ! [[ $REPLICATION_SIZE =~ ^[2-9]+$ ]]; then
-            echo "ERROR: --replication_size must be a positive integer greater than 2"
-            print_help
-            exit
+  echo "ERROR: --replication_size must be a positive integer greater than 2"
+  print_help
+  exit
 fi
 
 if ! [[ $POOL_NAME =~ ^[0-9A-Za-z_]+$ ]]; then
-            echo  "ERROR: --pool must be alphanumberic, including underscores, no spaces"
-            print_help
-            exit
+  echo  "ERROR: --pool must be alphanumberic, including underscores, no spaces"
+  print_help
+  exit
 fi
-
-if ! [ -z $POOL_NAME ]; then #if pool is defined, then lets try to create it
+if ! [[ $PG_NUM =~ ^[2-9]+$ ]]; then
+  echo  "ERROR: --pg_num must be a positive integer greater than 2"
+  print_help
+  exit
+fi
+if ! [ -z $POOL_NAME ]; then #if pool is passed to script, then lets try to create it
   check_create_pool $POOL_NAME $PG_NUM
-
+fi
 
 }
 
@@ -193,7 +197,7 @@ elif [[ $1 == "--rbd_dd" ]]
 	if [[ $# -eq 6 || $# -eq 8 ]]; then #the correct number of args
 	  check_input_args_for_rbd_dd $2 $3 $4 $5 $6 $7 $8 
 	else
-	  echo "Wrong number of arguments received for rbd_dd"
+	  echo "Wrong number of arguments received for rbd_dd"v
 	  print_help
 	  exit
 	fi 
