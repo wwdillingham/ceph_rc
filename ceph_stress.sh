@@ -75,6 +75,23 @@ function rbd_dd() {
  TEST_TIME_IN_SEC=$4
  POOL_NAME=$5
  REPLICATION_SIZE=$6
+ 
+ #first create the rbd devices and prep their mount points
+ if ! [ -d /mnt/rbd_dd ]; then
+   mkdir /mnt/rbd_dd
+ fi
+ for rbd_device in `seq 1 $NUM_BLOCK_DEVICE`
+ do
+   if ! [ -d /mnt/rbd_dd/$rbd_device ]; then
+     mkdir /mnt/rbd_dd/$rbd_device
+     rbd -p $POOL_NAME create --size $SIZE_BLOCK_DEVICE rbd_test_$rbd_device
+     rbd -p $POOL_NAME map rbd_test_$rbd_device
+   fi
+   
+   # At this point we need to ensure that /dev/rdbX is grabbed and used to build the filesystem on.
+   
+ done
+ 
 }
 
 function rados_bench() {
