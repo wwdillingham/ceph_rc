@@ -75,12 +75,13 @@ function rbd_dd() {
  TEST_TIME_IN_SEC=$4
  POOL_NAME=$5
  REPLICATION_SIZE=$6
- 
+ COUNT= $SIZE_BLOCK_DEVICE / $BLOCK_SIZE_IN_MB
  #first create the rbd devices and prep their mount points
  if ! [ -d /mnt/rbd_dd ]; then
    mkdir /mnt/rbd_dd
  fi
  RBD_MAP_LIST=()
+ declare -A RBD_MOUNT_ARRAY
  for rbd_device in `seq 1 $NUM_BLOCK_DEVICE`
  do
    if ! [ -d /mnt/rbd_dd/$rbd_device ]; then
@@ -89,7 +90,9 @@ function rbd_dd() {
      #the output of the rbd map command is the /dev/rbdX that it gets mapped to exectute cmd and set variable:
      MAPPED_LOCATION=`rbd -p $POOL_NAME map rbd_test_$rbd_device`
      RBD_MAP_LIST+=($MAPPED_LOCATION)
+     RBD_MOUNT_ARRAY[$MAPPED_LOCATION]=$rbd_device
      mkfs.xfs $MAPPED_LOCATION
+     mount $MAPPED_LOCATION /mnt/rbd_dd/$rbd_device
    else
      echo "ERROR: /mnt/rbd_dd/$rbd_device already exists"
      echo "This is likely left over by a previous rbd_dd benchmark - please manually inspect"
@@ -102,6 +105,11 @@ function rbd_dd() {
    fi
  done
  
+ #we now have a list /dev/rbdX devices lets mount them
+ for RBD_DEV in "${RBD_MAP_LIST[@]}" #/dev/rbd0 etc
+ do
+   dd if=/dev/zero of=/mnt/rbd_dd/${RBD_MAP_LIST[$RBD_DEV]} bs=${BLOCK_SIZE_IN_MB}M count=$COUNT oflag=direct &
+ done
 }
 
 function rados_bench() {
