@@ -80,16 +80,26 @@ function rbd_dd() {
  if ! [ -d /mnt/rbd_dd ]; then
    mkdir /mnt/rbd_dd
  fi
+ RBD_MAP_LIST=()
  for rbd_device in `seq 1 $NUM_BLOCK_DEVICE`
  do
    if ! [ -d /mnt/rbd_dd/$rbd_device ]; then
      mkdir /mnt/rbd_dd/$rbd_device
      rbd -p $POOL_NAME create --size $SIZE_BLOCK_DEVICE rbd_test_$rbd_device
-     rbd -p $POOL_NAME map rbd_test_$rbd_device
+     #the output of the rbd map command is the /dev/rbdX that it gets mapped to exectute cmd and set variable:
+     MAPPED_LOCATION=`rbd -p $POOL_NAME map rbd_test_$rbd_device`
+     RBD_MAP_LIST+=($MAPPED_LOCATION)
+     mkfs.xfs $MAPPED_LOCATION
+   else
+     echo "ERROR: /mnt/rbd_dd/$rbd_device already exists"
+     echo "This is likely left over by a previous rbd_dd benchmark - please manually inspect"
+     echo "and remove any directories in /mnt/rbd_dd that are no longer needed"
+     echo "you may find the following useful:"
+     echo "rbd showmapped"
+     echo "mount | grep -i rbd"
+     echo "Will now abort process to prevent any damage"
+     exit
    fi
-   
-   # At this point we need to ensure that /dev/rdbX is grabbed and used to build the filesystem on.
-   
  done
  
 }
