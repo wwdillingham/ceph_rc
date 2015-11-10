@@ -109,6 +109,7 @@ function rbd_dd() {
  for RBD_DEV in "${RBD_MAP_LIST[@]}" #/dev/rbd0 etc
  do
    dd if=/dev/zero of=/mnt/rbd_dd/${RBD_MAP_LIST[$RBD_DEV]} bs=${BLOCK_SIZE_IN_MB}M count=$COUNT oflag=direct &
+   #need to not perform last one as background process, we will use the last of the group to indicate when it is ready to move on to another cycle. At which point we will process another round if and only if the time has not expired.
  done
 }
 
