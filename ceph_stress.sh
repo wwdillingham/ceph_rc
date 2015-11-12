@@ -351,7 +351,7 @@ function check_input_args_for_rados_bench() {
     print_help
     exit
   fi
-  if ! [[ $MODE == "seq" || $MODE == "write" || $MODE == "rand"]]; then
+  if ! [[ $MODE == "seq" || $MODE == "write" || $MODE == "rand" ]]; then
     echo "ERROR: --mode can either be seq, write, or rand"
     print_help
     exit
