@@ -165,6 +165,8 @@ for arg in "$@"
 do
 	KEY=`echo $arg | awk -F "=" '{print $1}'`
   VALUE=`echo $arg | awk -F "=" '{print $2}'`
+  
+  
 	#Check if there is a flag that shouldnt be there
 	if [[ $KEY != "--num_block_devices" && $KEY != "--block_device_size" && $KEY != "--block_size" && $KEY != "--time" && $KEY != "--pool" && $KEY != "--replication_size" && $KEY != "--pg_num" ]]; then
 		echo "ERROR: $arg is not a valid parameter"
@@ -194,27 +196,27 @@ do
   fi
 done
 
-if ! [[ $NUM_BLOCK_DEVICE =~ ^[1-9]+$ ]]; then
+if ! [[ $NUM_BLOCK_DEVICE =~ ^[1-9][0-9]+$ ]]; then
   echo "ERROR: --num_block_devices must be a positive integer"
   print_help
   exit
 fi
-if ! [[ $SIZE_BLOCK_DEVICE =~ ^[1-9]+$ ]]; then
+if ! [[ $SIZE_BLOCK_DEVICE =~ ^[1-9][0-9]+$ ]]; then
   echo "ERROR: --block_device_size must be a positive integer"
   print_help
   exit
 fi
-if ! [[ $BLOCK_SIZE_IN_MB =~ ^[1-9]+$ ]]; then
+if ! [[ $BLOCK_SIZE_IN_MB =~ ^[1-9][0-9]+$ ]]; then
   echo "ERROR: --block_size must be a positive integer"
   print_help
   exit
 fi
-if ! [[ $TEST_TIME_IN_SEC =~ ^[1-9]+$ ]]; then
+if ! [[ $TEST_TIME_IN_SEC =~ ^[1-9][0-9]+$ ]]; then
   echo "ERROR: --time must be a positive integer"
   print_help
   exit
 fi
-if ! [[ $REPLICATION_SIZE =~ ^[2-9]+$ ]]; then
+if ! [[ $REPLICATION_SIZE =~ ^[2-9][0-9]+$ ]]; then
   echo "ERROR: --replication_size must be a positive integer greater than 2"
   print_help
   exit
@@ -225,7 +227,7 @@ if ! [[ $POOL_NAME =~ ^[0-9A-Za-z_]+$ ]]; then
   print_help
   exit
 fi
-if ! [[ $PG_NUM =~ ^[2-9]+$ ]]; then
+if ! [[ $PG_NUM =~ ^[2-9][0-9]+$ ]]; then
   echo  "ERROR: --pg_num must be a positive integer greater than 2"
   print_help
   exit
@@ -274,17 +276,17 @@ fi
 
 done  
   
-if ! [[ $NUM_BLOCK_DEVICE =~ ^[1-9]+$ ]]; then
+if ! [[ $NUM_BLOCK_DEVICE =~ ^[1-9][0-9]+$ ]]; then
   echo "ERROR: --num_block_devices must be a positive integer"
   print_help
   exit
 fi
-if ! [[ $SIZE_BLOCK_DEVICE =~ ^[1-9]+$ ]]; then
+if ! [[ $SIZE_BLOCK_DEVICE =~ ^[1-9][0-9]+$ ]]; then
   echo "ERROR: --block_device_size must be a positive integer"
   print_help
   exit
 fi
-if ! [[ $REPLICATION_SIZE =~ ^[2-9]+$ ]]; then
+if ! [[ $REPLICATION_SIZE =~ ^[2-9][0-9]+$ ]]; then
   echo "ERROR: --replication_size must be a positive integer greater than 2"
   print_help
   exit
@@ -295,7 +297,7 @@ if ! [[ $POOL_NAME =~ ^[0-9A-Za-z_]+$ ]]; then
   print_help
   exit
 fi
-if ! [[ $PG_NUM =~ ^[2-9]+$ ]]; then
+if ! [[ $PG_NUM =~ ^[2-9][0-9]+$ ]]; then
   echo  "ERROR: --pg_num must be a positive integer greater than 2"
   print_help
   exit
@@ -337,7 +339,7 @@ function check_input_args_for_rados_bench() {
     fi
   done
 
-  if ! [[ $REPLICATION_SIZE =~ ^[2-9]+$ ]]; then
+  if ! [[ $REPLICATION_SIZE =~ ^[2-9][0-9]+$ ]]; then
     echo "ERROR: --replication_size must be a positive integer greater than 2"
     print_help
     exit
@@ -347,7 +349,7 @@ function check_input_args_for_rados_bench() {
     print_help
     exit
   fi
-  if ! [[ $PG_NUM =~ ^[2-9]+$ ]]; then
+  if ! [[ $PG_NUM =~ ^[2-9][0-9]+$ ]]; then
     echo  "ERROR: --pg_num must be a positive integer greater than 2"
     print_help
     exit
@@ -357,12 +359,12 @@ function check_input_args_for_rados_bench() {
     print_help
     exit
   fi
-  if ! [[ $ops =~ ^[1-9]+$ ]]; then
+  if ! [[ $ops =~ ^[1-9][0-9]+$ ]]; then
     echo "ERROR --ops must be a positive integer"
     print_help
     exit
   fi
-  if ! [[ $TEST_TIME_IN_SEC =~ ^[1-9]+$ ]]; then
+  if ! [[ $TEST_TIME_IN_SEC =~ ^[1-9][0-9]+$ ]]; then
     echo "ERROR: --time must be a positive integer"
     print_help
     exit
