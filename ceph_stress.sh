@@ -166,7 +166,7 @@ do
 	KEY=`echo $arg | awk -F "=" '{print $1}'`
   VALUE=`echo $arg | awk -F "=" '{print $2}'`
 	#Check if there is a flag that shouldnt be there
-	if [[ $KEY != "--num_block_devices" && $KEY != "--block_device_size" && $KEY != "--block_size" && $KEY != "--time" && $KEY != "-pool" && $KEY != "--replication_size" ]]; then
+	if [[ $KEY != "--num_block_devices" && $KEY != "--block_device_size" && $KEY != "--block_size" && $KEY != "--time" && $KEY != "--pool" && $KEY != "--replication_size" ]]; then
 		echo "ERROR: $arg is not a valid parameter"
 		print_help
 		exit
