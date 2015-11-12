@@ -112,6 +112,7 @@ function rbd_dd() {
  END_TIME=$((START_TIME+TEST_TIME_IN_SEC))
  NUM_DD_STARTED=0
  while [ `date %s` -lt $END_TIME ]
+ do
  NUM_DD_STARTED=0
    for RBD_DEV in "${RBD_MAP_LIST[@]}" #/dev/rbd0 etc
    do
