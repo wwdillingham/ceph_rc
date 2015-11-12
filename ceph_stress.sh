@@ -318,6 +318,7 @@ function check_input_args_for_rados_bench() {
     
     if [[ $KEY == "--time" ]]; then
       TEST_TIME_IN_SEC=$VALUE
+    fi
     if [[ $KEY == "--mode" ]]; then
       MODE=$VALUE
     fi
