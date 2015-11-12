@@ -14,7 +14,7 @@
 
 
 #Purpose 
-#This script is intended to stess test a ceph cluster it 
+#This script is intended to stess test a ceph cluster  
 
 #I know who I am, do you know who you are?
 if [[ `id -u` != 0 ]]; then
@@ -82,14 +82,16 @@ function rbd_dd() {
  fi
  RBD_MAP_LIST=()
  declare -A RBD_MOUNT_ARRAY
+ 
+ #Make mountpoints, map them to rbd devices, build filesystems, mount filesystems
  for rbd_device in `seq 1 $NUM_BLOCK_DEVICE`
  do
    if ! [ -d /mnt/rbd_dd/$rbd_device ]; then
      mkdir /mnt/rbd_dd/$rbd_device
      rbd -p $POOL_NAME create --size $SIZE_BLOCK_DEVICE rbd_test_$rbd_device
      #the output of the rbd map command is the /dev/rbdX that it gets mapped to exectute cmd and set variable:
-     MAPPED_LOCATION=`rbd -p $POOL_NAME map rbd_test_$rbd_device`
-     RBD_MAP_LIST+=($MAPPED_LOCATION)
+     MAPPED_LOCATION=`rbd -p $POOL_NAME map rbd_test_$rbd_device` #/dev/rbd0 /dev/rbd1 etc
+     RBD_MAP_LIST+=($MAPPED_LOCATION) #make and array of all of the /dev/rbd devices
      RBD_MOUNT_ARRAY[$MAPPED_LOCATION]=$rbd_device
      mkfs.xfs $MAPPED_LOCATION
      mount $MAPPED_LOCATION /mnt/rbd_dd/$rbd_device
@@ -105,12 +107,22 @@ function rbd_dd() {
    fi
  done
  
- #we now have a list /dev/rbdX devices lets mount them
- for RBD_DEV in "${RBD_MAP_LIST[@]}" #/dev/rbd0 etc
- do
-   dd if=/dev/zero of=/mnt/rbd_dd/${RBD_MAP_LIST[$RBD_DEV]} bs=${BLOCK_SIZE_IN_MB}M count=$COUNT oflag=direct &
-   #need to not perform last one as background process, we will use the last of the group to indicate when it is ready to move on to another cycle. At which point we will process another round if and only if the time has not expired.
- done
+ 
+ START_TIME=`date +%s`
+ END_TIME=$((START_TIME+TEST_TIME_IN_SEC))
+ while [[ `date %s` -lt $END_TIME]]
+ let NUM_DD_STARTED=0
+   for RBD_DEV in "${RBD_MAP_LIST[@]}" #/dev/rbd0 etc
+   do
+     if [[ $RBD_DEV == ${RBD_MAP_LIST[-1]} ]]; then #if its the last element in the array, dont run in BG
+       dd if=/dev/zero of=/mnt/rbd_dd/${RBD_MAP_LIST[$RBD_DEV]} bs=${BLOCK_SIZE_IN_MB}M count=$COUNT oflag=direct 
+       NUM_DD_STARTED=$((NUM_DD_STARTED+1))
+     else #its not the last item in the array
+       dd if=/dev/zero of=/mnt/rbd_dd/${RBD_MAP_LIST[$RBD_DEV]} bs=${BLOCK_SIZE_IN_MB}M count=$COUNT oflag=direct &
+     fi
+   #nee to not perform last one as background process, we will use the last of the group to indicate when it is ready to move on to another cycle. At which point we will process another round if and only if the time has not expired.
+    done
+  done
 }
 
 function rados_bench() {
