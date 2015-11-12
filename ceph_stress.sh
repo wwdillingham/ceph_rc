@@ -174,22 +174,22 @@ do
   if [[ $KEY == "--num_block_devices" ]]; then
     NUM_BLOCK_DEVICE=$VALUE
   fi
-  if [[ $KEY == "--block_device_size" ]]
+  if [[ $KEY == "--block_device_size" ]]; then
     SIZE_BLOCK_DEVICE=$VALUE
   fi
-  if [[ $KEY == "--block_size" ]]
+  if [[ $KEY == "--block_size" ]]; then
     BLOCK_SIZE_IN_MB=$VALUE
   fi
-  if [[ $KEY == "--time" ]]
+  if [[ $KEY == "--time" ]]; then
     TEST_TIME_IN_SEC=$VALUE
   fi
-  if [[ $KEY == "--pool" ]]
+  if [[ $KEY == "--pool" ]]; then
     POOL_NAME=$VALUE
   fi
-  if [[ $KEY == "--replication_size" ]]
+  if [[ $KEY == "--replication_size" ]]; then
     REPLICATION_SIZE=$VALUE
   fi
-  if [[ $KEY == "--pg_num" ]]
+  if [[ $KEY == "--pg_num" ]]l then
     PG_NUM=$VALUE
   fi
 done
