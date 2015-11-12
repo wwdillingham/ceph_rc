@@ -189,7 +189,7 @@ do
   if [[ $KEY == "--replication_size" ]]; then
     REPLICATION_SIZE=$VALUE
   fi
-  if [[ $KEY == "--pg_num" ]]l then
+  if [[ $KEY == "--pg_num" ]]; then
     PG_NUM=$VALUE
   fi
 done
