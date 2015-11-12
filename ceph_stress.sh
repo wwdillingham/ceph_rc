@@ -256,6 +256,7 @@ fi
   fi
   if [[ $KEY == "--block_device_size" ]]; then
     SIZE_BLOCK_DEVICE=$VALUE
+    echo "Size block device is $SIZE_BLOCK_DEVICE"
   fi
   if [[ $KEY == "--pool" ]]; then
     POOL_NAME=$VALUE
