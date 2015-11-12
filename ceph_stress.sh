@@ -383,12 +383,12 @@ function check_input_args_for_rbd_benchwrite() {
 echo "dollar sign 1: $1"
 echo "dollar sign 2: $2"
 
-if [[ $1 == "--help" ]] 
+if [[ $1 == "--help" ]]; then
 	print_help
 elif [[  $1 -ne "--rbd_dd" && $1 -ne "--rados_bench" && $1 -ne "--rbd_benchwrite" &&  $1 -ne "rbd_bonnie" ]]; then
 	echo "ERROR: Invalid first option"
         print_help
-elif [[ $1 == "--rbd_dd" ]]
+elif [[ $1 == "--rbd_dd" ]]; then
 	echo "Performing rbd mounts and doing a dd" 
 	if [[ $# -eq 6 || $# -eq 8 ]]; then #the correct number of args
 	  check_input_args_for_rbd_dd $2 $3 $4 $5 $6 $7 $8 
@@ -398,7 +398,7 @@ elif [[ $1 == "--rbd_dd" ]]
 	  exit
 	fi 
 	rbd_dd
-elif [[ $1 == "--rbd_bonnie" ]]
+elif [[ $1 == "--rbd_bonnie" ]]; then
 	echo "Performing rbd mounts and doing a bonnie run upon that rbd mount"
   if [[ $# -eq 5 || $# -eq 7 ]]; then
     check_input_args_for_rbd_bonnie $2 $3 $4 $5 $6 $7
@@ -407,7 +407,7 @@ elif [[ $1 == "--rbd_bonnie" ]]
     print_help
     exit
   fi 
-elif [[ $1 == "-rados_bench" ]]
+elif [[ $1 == "-rados_bench" ]]; then
 	echo "Engaging rados bench utility"
   if [[ $# -eq 5 || $# -eq 7 ]]; then
     echo "Performing rados bench operation"
@@ -418,7 +418,7 @@ elif [[ $1 == "-rados_bench" ]]
     exit
   fi
 	rados_bench
-elif [[ $1 == "--rbd_benchwrite" ]]
+elif [[ $1 == "--rbd_benchwrite" ]]; then
 	echo "Engaging rbd bench-write system"
 	rbd_benchwrite
 else
