@@ -253,15 +253,20 @@ fi
 
   if [[ $KEY == "--num_block_devices" ]]; then
     NUM_BLOCK_DEVICE=$VALUE
-  elif [[ $KEY == "--block_device_size" ]]
+  fi
+  if [[ $KEY == "--block_device_size" ]]; then
     SIZE_BLOCK_DEVICE=$VALUE
-  elif [[ $KEY == "--pool" ]]
+  fi
+  if [[ $KEY == "--pool" ]]; then
     POOL_NAME=$VALUE
-  elif [[ $KEY == "--replication_size" ]]
+  fi
+  if [[ $KEY == "--replication_size" ]]; then
     REPLICATION_SIZE=$VALUE
-  elif [[ $KEY == "--pg_num" ]]
+  fi
+  if [[ $KEY == "--pg_num" ]]; then
     PG_NUM=$VALUE
-  elif [[ $key == "--bonnie_string" ]]
+  fi
+  if [[ $key == "--bonnie_string" ]]; then
     BONNIE_STRING=$VALUE
   fi
   
@@ -313,15 +318,19 @@ function check_input_args_for_rados_bench() {
     
     if [[ $KEY == "--time" ]]; then
       TEST_TIME_IN_SEC=$VALUE
-    elif [[ $KEY == "--mode" ]]
+    if [[ $KEY == "--mode" ]]; then
       MODE=$VALUE
-    elif [[ $KEY == "--ops" ]]
+    fi
+    if [[ $KEY == "--ops" ]]; then
       OPS=$VALUE
-    elif [[ $KEY == "--pool" ]]
+    fi
+    if [[ $KEY == "--pool" ]]; then
       POOL_NAME=$VALUE
-    elif [[ $KEY == "--replication_size" ]]
+    fi
+    if [[ $KEY == "--replication_size" ]]; then
       REPLICATION_SIZE=$VALUE
-    elif [[ $key == "--pg_num" ]]
+    fi
+    if [[ $key == "--pg_num" ]]; then
       PG_NUM=$VALUE
     fi
   done
