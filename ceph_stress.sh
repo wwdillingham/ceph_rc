@@ -371,6 +371,7 @@ function check_input_args_for_rados_bench() {
 }
 
 function check_input_args_for_rbd_benchwrite() {
+  echo "this is a placeholder"
 }
 
 
