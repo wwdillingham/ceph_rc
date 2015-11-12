@@ -110,6 +110,7 @@ function rbd_dd() {
  
  START_TIME=`date +%s`
  END_TIME=$((START_TIME+TEST_TIME_IN_SEC))
+ NUM_DD_STARTED=0
  while [[ `date %s` -lt $END_TIME]]
  let NUM_DD_STARTED=0
    for RBD_DEV in "${RBD_MAP_LIST[@]}" #/dev/rbd0 etc
@@ -119,10 +120,20 @@ function rbd_dd() {
        NUM_DD_STARTED=$((NUM_DD_STARTED+1))
      else #its not the last item in the array
        dd if=/dev/zero of=/mnt/rbd_dd/${RBD_MAP_LIST[$RBD_DEV]} bs=${BLOCK_SIZE_IN_MB}M count=$COUNT oflag=direct &
+       NUM_DD_STARTED=$((NUM_DD_STARTED+1))
      fi
    #nee to not perform last one as background process, we will use the last of the group to indicate when it is ready to move on to another cycle. At which point we will process another round if and only if the time has not expired.
     done
   done
+  FINISHED_TIME=`date +%s`
+  TIME_RAN=$((FINISHED_TIME-START_TIME))
+  TOTAL_MB_TRANSFERRED=$((BLOCK_SIZE_IN_MB*COUNT*NUM_DD_STARTED))
+  MB_PER_SECOND=$((TOTAL_MB_TRANSFERRED/TIME_RAN))
+  echo "Start Time: $START_TIME"
+  echo "Finish Time: $FINISHED_TIME"
+  echo "Total MB xfer: $TOTAL_MB_TRANSFERRED"
+  echo "Average MB/s xfer: $MB_PER_SECOND"
+  
 }
 
 function rados_bench() {
