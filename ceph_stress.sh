@@ -173,17 +173,23 @@ do
 	fi
   if [[ $KEY == "--num_block_devices" ]]; then
     NUM_BLOCK_DEVICE=$VALUE
-  elif [[ $KEY == "--block_device_size" ]]
+  fi
+  if [[ $KEY == "--block_device_size" ]]
     SIZE_BLOCK_DEVICE=$VALUE
-  elif [[ $KEY == "--block_size" ]]
+  fi
+  if [[ $KEY == "--block_size" ]]
     BLOCK_SIZE_IN_MB=$VALUE
-  elif [[ $KEY == "--time" ]]
+  fi
+  if [[ $KEY == "--time" ]]
     TEST_TIME_IN_SEC=$VALUE
-  elif [[ $KEY == "--pool" ]]
+  fi
+  if [[ $KEY == "--pool" ]]
     POOL_NAME=$VALUE
-  elif [[ $KEY == "--replication_size" ]]
+  fi
+  if [[ $KEY == "--replication_size" ]]
     REPLICATION_SIZE=$VALUE
-  elif [[ $KEY == "--pg_num" ]]
+  fi
+  if [[ $KEY == "--pg_num" ]]
     PG_NUM=$VALUE
   fi
 done
