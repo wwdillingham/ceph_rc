@@ -111,8 +111,8 @@ function rbd_dd() {
  START_TIME=`date +%s`
  END_TIME=$((START_TIME+TEST_TIME_IN_SEC))
  NUM_DD_STARTED=0
- while [[ `date %s` -lt $END_TIME]]
- let NUM_DD_STARTED=0
+ while [ `date %s` -lt $END_TIME ]
+ NUM_DD_STARTED=0
    for RBD_DEV in "${RBD_MAP_LIST[@]}" #/dev/rbd0 etc
    do
      if [[ $RBD_DEV == ${RBD_MAP_LIST[-1]} ]]; then #if its the last element in the array, dont run in BG
