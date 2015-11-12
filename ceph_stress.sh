@@ -385,9 +385,9 @@ echo "dollar sign 2: $2"
 
 if [[ $1 == "--help" ]]; then
 	print_help
-elif [[  $1 -ne "--rbd_dd" && $1 -ne "--rados_bench" && $1 -ne "--rbd_benchwrite" &&  $1 -ne "rbd_bonnie" ]]; then
+elif [[ $1 -ne "--rbd_dd" && $1 -ne "--rados_bench" && $1 -ne "--rbd_benchwrite" &&  $1 -ne "rbd_bonnie" ]]; then
 	echo "ERROR: Invalid first option"
-        print_help
+  print_help
 elif [[ $1 == "--rbd_dd" ]]; then
 	echo "Performing rbd mounts and doing a dd" 
 	if [[ $# -eq 6 || $# -eq 8 ]]; then #the correct number of args
