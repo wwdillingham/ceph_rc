@@ -412,7 +412,7 @@ elif [[ $1 == "rbd_dd" ]]; then
 	  print_help
 	  exit
 	fi 
-	rbd_dd
+	rbd_dd $2 $3 $4 $5 $6 $7 $8 
 elif [[ $1 == "rbd_bonnie" ]]; then
 	echo "Performing rbd mounts and doing a bonnie run upon that rbd mount"
   if [[ $# -eq 5 || $# -eq 7 ]]; then
