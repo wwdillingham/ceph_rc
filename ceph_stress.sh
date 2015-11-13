@@ -416,7 +416,7 @@ elif [[ $1 != "rbd_dd" && $1 != "rados_bench" && $1 != "rbd_benchwrite" &&  $1 !
 elif [[ $1 == "rbd_dd" ]]; then
 	echo "Performing rbd mounts and doing a dd" 
 	if [[ $# -eq 6 || $# -eq 8 ]]; then #the correct number of args
-	  check_input_args_for_rbd_dd $2 $3 $4 $5 $6 $7 $8 
+	  check_input_args_for_rbd_dd $2 $3 $4 $5 $6 $7 $8 #rbd_dd function will called from within input checking function
 	else
 	  echo "Wrong number of arguments received for rbd_dd"
 	  print_help
@@ -425,7 +425,7 @@ elif [[ $1 == "rbd_dd" ]]; then
 elif [[ $1 == "rbd_bonnie" ]]; then
 	echo "Performing rbd mounts and doing a bonnie run upon that rbd mount"
   if [[ $# -eq 5 || $# -eq 7 ]]; then
-    check_input_args_for_rbd_bonnie $2 $3 $4 $5 $6 $7
+    check_input_args_for_rbd_bonnie $2 $3 $4 $5 $6 $7 #rbd_bonnie function will be called from within input checking function
   else
     echo "Wrong number of arguments received for rbd_bonnie"
     print_help
@@ -435,7 +435,7 @@ elif [[ $1 == "rados_bench" ]]; then
 	echo "Engaging rados bench utility"
   if [[ $# -eq 5 || $# -eq 7 ]]; then
     echo "Performing rados bench operation"
-    check_input_args_for_rados_bench $2 $3 $4 $5 $6 $7
+    check_input_args_for_rados_bench $2 $3 $4 $5 $6 $7 #rados_bench will be called from within the input checking function
   else
     echo "Wrong number of arguments received for rados_bench"
     print_help
@@ -444,7 +444,7 @@ elif [[ $1 == "rados_bench" ]]; then
 	rados_bench
 elif [[ $1 == "rbd_benchwrite" ]]; then
 	echo "Engaging rbd bench-write system"
-	rbd_benchwrite
+	check_input_args_for_rbd_benchwrite #rbd_benchwrite will be called from within the input checking function
 else
 	echo "ERROR: input is malformed"
 	print_help
