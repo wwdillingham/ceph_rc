@@ -26,10 +26,10 @@ fi
 function print_help() {
 	echo -e "--help : print this menu \n"
 	echo "This utility has 4 modes"
-        echo "Usage:   --rbd_dd [options]   or   --rbd_bonnie [options]   or   --rados_bench [options]    or   --rbd_benchwrite [options]"
-        echo "Note either --rbd_dd or --rbd_bonnie or --rados_bench or --rbd_benchwrite must be passed as the first argument (order matters)"
+        echo "Usage:   rbd_dd [options]   or   rbd_bonnie [options]   or   rados_bench [options]    or   rbd_benchwrite [options]"
+        echo "Note either rbd_dd or rbd_bonnie or rados_bench or rbd_benchwrite must be passed as the first argument (order matters)"
         echo "----------------------------------------------"
-        echo "--rbd_dd options:"
+        echo "rbd_dd options:"
         echo "--num_block_devices=integer [required]"
         echo "--block_device_size=integer size in MB [required]"
         echo "--block_size=integer block size to use for write [required]"
@@ -38,7 +38,7 @@ function print_help() {
         echo "--replication_size=integer number of replicas to make [required for non-existent pools, ignored for existing pools]"
         echo "--pg_num=integer number of placement groups for the pool [required for non-existent pools, ignored for existing pools]"
         echo "----------------------------------------------"
-        echo "--rbd_bonnie options:"
+        echo "rbd_bonnie options:"
         echo "--bonnie_string=\"string\" enclose bonnie++ options to run in parentheses [required]"
         echo "--num_block_devices=integer [required]"
         echo "--block_device_size=integer size in MB [required]"
@@ -46,14 +46,15 @@ function print_help() {
         echo "--replication_size  number of replicas to make [required for non-existent pools, ignored for existing pools]"
         echo "--pg_num=integer number of placement groups for the pool [required for non-existent pools, ignored for existing pools]"
         echo "----------------------------------------------"
-        echo "--rados_bench options:"
+        echo "rados_bench options:"
         echo "--time=integer Time to sustain test. In progress write operations will continue till completion [required]" 
         echo "--mode=[write,seq,rand] write mode to test ....., sequential writes, random writes [required]"
         echo "--ops=integer number of concurrent rados operations per client[required]"
         echo "--pool=string pool name to use, will create if non-existent but will not remove pool [required]"
         echo "--replication_size=integer number of replicas to make [required for non-existent pools, ignored for existing pools]"
         echo "--pg_num=integer number of placement groups for the pool [required for non-existent pools, ignored for existing pools]"
-        echo "--rbd_benchwrite options:"
+        echo "rbd_benchwrite options:"
+        echo "NEED TO WRITE THESE"
 }
 
 function check_create_pool() {
@@ -222,7 +223,7 @@ if ! [[ $REPLICATION_SIZE =~ ^[2-9]+[0-9]*$ ]]; then
   exit
 fi
 
-if ! [[ $POOL_NAME =~ ^[0-9A-Za-z_]*$ ]]; then
+if ! [[ $POOL_NAME =~ ^[0-9A-Za-z_]+$ ]]; then
   echo  "ERROR: --pool must be alphanumberic, including underscores, no spaces"
   print_help
   exit
@@ -386,12 +387,12 @@ function check_input_args_for_rbd_benchwrite() {
 echo "dollar sign 1: $1"
 echo "dollar sign 2: $2"
 
-if [[ $1 == "--help" ]]; then
+if [[ $1 == "--help" || $1 == "help" || $1 == "-h" ]]; then
 	print_help
-elif [[ $1 != "--rbd_dd" && $1 != "--rados_bench" && $1 != "--rbd_benchwrite" &&  $1 != "rbd_bonnie" ]]; then
+elif [[ $1 != "rbd_dd" && $1 != "rados_bench" && $1 != "rbd_benchwrite" &&  $1 != "rbd_bonnie" ]]; then
 	echo "ERROR: Invalid first option"
   print_help
-elif [[ $1 == "--rbd_dd" ]]; then
+elif [[ $1 == "rbd_dd" ]]; then
 	echo "Performing rbd mounts and doing a dd" 
 	if [[ $# -eq 6 || $# -eq 8 ]]; then #the correct number of args
 	  check_input_args_for_rbd_dd $2 $3 $4 $5 $6 $7 $8 
@@ -401,27 +402,27 @@ elif [[ $1 == "--rbd_dd" ]]; then
 	  exit
 	fi 
 	rbd_dd
-elif [[ $1 == "--rbd_bonnie" ]]; then
+elif [[ $1 == "rbd_bonnie" ]]; then
 	echo "Performing rbd mounts and doing a bonnie run upon that rbd mount"
   if [[ $# -eq 5 || $# -eq 7 ]]; then
     check_input_args_for_rbd_bonnie $2 $3 $4 $5 $6 $7
   else
-    echo "Wrong number of arguments received for --rbd_bonnie"
+    echo "Wrong number of arguments received for rbd_bonnie"
     print_help
     exit
   fi 
-elif [[ $1 == "-rados_bench" ]]; then
+elif [[ $1 == "rados_bench" ]]; then
 	echo "Engaging rados bench utility"
   if [[ $# -eq 5 || $# -eq 7 ]]; then
     echo "Performing rados bench operation"
     check_input_args_for_rados_bench $2 $3 $4 $5 $6 $7
   else
-    echo "Wrong number of arguments received for --rados_bench"
+    echo "Wrong number of arguments received for rados_bench"
     print_help
     exit
   fi
 	rados_bench
-elif [[ $1 == "--rbd_benchwrite" ]]; then
+elif [[ $1 == "rbd_benchwrite" ]]; then
 	echo "Engaging rbd bench-write system"
 	rbd_benchwrite
 else
