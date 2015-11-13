@@ -243,7 +243,7 @@ if ! [ -z $POOL_NAME ]; then #if pool is passed to script, then lets try to crea
   check_create_pool $POOL_NAME $PG_NUM $REPLICATION_SIZE
 fi
 
-rbd_dd $TEST_TIME_IN_SEC $TEST_MODE $CONCURRENT_OPERATIONS $OPERATION_SIZE_IN_MB $POOL_NAME
+rbd_dd $NUM_BLOCK_DEVICE $SIZE_BLOCK_DEVICE $BLOCK_SIZE_IN_MB $TEST_TIME_IN_SEC $POOL_NAME
 
 }
 
