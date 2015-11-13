@@ -127,10 +127,14 @@ function rbd_dd() {
    do
      if [[ $RBD_DEV == ${RBD_MAP_LIST[-1]} ]]; then #if its the last element in the array, dont run in BG
        echo "RBD_MOUNT_ARRAY[RBD_DEV] is ${RBD_MOUNT_ARRAY[$RBD_DEV]} - last element  " #remove later
+       echo "block size is ${BLOCK_SIZE_IN_MB}" #remove later
+       echo "count is $COUNT" #Remove later
        dd if=/dev/zero of=/mnt/rbd_dd/${RBD_MOUNT_ARRAY[$RBD_DEV]} bs=${BLOCK_SIZE_IN_MB}M count=$COUNT oflag=direct 
        NUM_DD_STARTED=$((NUM_DD_STARTED+1))
      else #its not the last item in the array
         echo "RBD_MOUNT_ARRAY[RBD_DEV] is ${RBD_MOUNT_ARRAY[$RBD_DEV]} - non-last element  " #remove later
+        echo "block size is ${BLOCK_SIZE_IN_MB}" #remove later
+        echo "count is $COUNT" #Remove later
        dd if=/dev/zero of=/mnt/rbd_dd/${RBD_MOUNT_ARRAY[$RBD_DEV]} bs=${BLOCK_SIZE_IN_MB}M count=$COUNT oflag=direct &
        NUM_DD_STARTED=$((NUM_DD_STARTED+1))
      fi
