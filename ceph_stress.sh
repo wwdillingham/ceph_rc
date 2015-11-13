@@ -60,9 +60,7 @@ function print_help() {
 function check_create_pool() {
   if [[ `ceph osd lspools | grep -i "$1" | wc -l` == 0 ]]; then
     echo "Creating Pool: $1"
-    rados mkpool $1
-    ceph osd pool set $1 pg_num $2 
-    ceph osd pool set $1 pgp_num $2
+    ceph osd pool create $1 $2
   else
     echo "That pool already exists - will use it for testing"
   fi
