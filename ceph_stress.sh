@@ -81,7 +81,6 @@ function rbd_dd() {
  echo "BLOCK_SIZE_IN_MB $BLOCK_SIZE_IN_MB"
  echo "TEST_TIME_IN_SEC $TEST_TIME_IN_SEC"
  echo "POOL_NAME $POOL_NAME"
- echo "REPLICATION_SIZE $REPLICATION_SIZE"
  
   
  exit
@@ -412,7 +411,7 @@ elif [[ $1 == "rbd_dd" ]]; then
 	  print_help
 	  exit
 	fi 
-	rbd_dd $2 $3 $4 $5 $6 $7 $8 
+	rbd_dd $2 $3 $4 $5 $6 
 elif [[ $1 == "rbd_bonnie" ]]; then
 	echo "Performing rbd mounts and doing a bonnie run upon that rbd mount"
   if [[ $# -eq 5 || $# -eq 7 ]]; then
