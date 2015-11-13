@@ -59,8 +59,9 @@ function print_help() {
 
 function check_create_pool() {
   if [[ `ceph osd lspools | grep -i "$1" | wc -l` == 0 ]]; then
-    echo "Creating Pool: $1"
+    echo "Creating Pool: $1 with $2 placement groups and $3 replicas"
     ceph osd pool create $1 $2
+    ceph osd pool set $1 size $3
   else
     echo "That pool already exists - will use it for testing"
   fi
@@ -232,7 +233,7 @@ if ! [[ $PG_NUM =~ ^[1-9]+[0-9]*$ && $PG_NUM -ge 2 ]]; then
   exit
 fi
 if ! [ -z $POOL_NAME ]; then #if pool is passed to script, then lets try to create it
-  check_create_pool $POOL_NAME $PG_NUM
+  check_create_pool $POOL_NAME $PG_NUM $REPLICATION_SIZE
 fi
 
 }
