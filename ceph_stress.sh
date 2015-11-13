@@ -75,6 +75,18 @@ function rbd_dd() {
  TEST_TIME_IN_SEC=$4
  POOL_NAME=$5
  REPLICATION_SIZE=$6
+ 
+ echo "NUM_BLOCK_DEVICE $NUM_BLOCK_DEVICE"
+ echo "SIZE_BLOCK_DEVICE $SIZE_BLOCK_DEVICE"
+ echo "BLOCK_SIZE_IN_MB $BLOCK_SIZE_IN_MB"
+ echo "TEST_TIME_IN_SEC $TEST_TIME_IN_SEC"
+ echo "POOL_NAME $POOL_NAME"
+ echo "REPLICATION_SIZE $REPLICATION_SIZE"
+ 
+  
+ exit
+ 
+ 
  COUNT= $SIZE_BLOCK_DEVICE / $BLOCK_SIZE_IN_MB
  #first create the rbd devices and prep their mount points
  if ! [ -d /mnt/rbd_dd ]; then
