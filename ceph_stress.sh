@@ -228,7 +228,7 @@ if ! [[ $POOL_NAME =~ ^[0-9A-Za-z_]+$ ]]; then
   print_help
   exit
 fi
-if ! [[ $PG_NUM =~ ^[2-9]+[0-9]*$ ]]; then
+if ! [[ $PG_NUM =~ ^[1-9]+[0-9]*$ && $PG_NUM >= 2 ]]; then
   echo  "ERROR: --pg_num must be a positive integer greater than 2"
   print_help
   exit
@@ -298,7 +298,7 @@ if ! [[ $POOL_NAME =~ ^[0-9A-Za-z_]+$ ]]; then
   print_help
   exit
 fi
-if ! [[ $PG_NUM =~ ^[2-9]+[0-9]*$ ]]; then
+if ! [[ $PG_NUM =~ ^[2-9]+[0-9]*$ && $PG_NUM >= 2 ]]; then
   echo  "ERROR: --pg_num must be a positive integer greater than 2"
   print_help
   exit
