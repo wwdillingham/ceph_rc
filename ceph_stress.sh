@@ -74,7 +74,6 @@ function rbd_dd() {
  BLOCK_SIZE_IN_MB=$3
  TEST_TIME_IN_SEC=$4
  POOL_NAME=$5
- REPLICATION_SIZE=$6
  
  echo "NUM_BLOCK_DEVICE $NUM_BLOCK_DEVICE"
  echo "SIZE_BLOCK_DEVICE $SIZE_BLOCK_DEVICE"
@@ -98,6 +97,7 @@ function rbd_dd() {
      rbd -p $POOL_NAME create --size $SIZE_BLOCK_DEVICE rbd_test_$rbd_device
      #the output of the rbd map command is the /dev/rbdX that it gets mapped to exectute cmd and set variable:
      MAPPED_LOCATION=`rbd -p $POOL_NAME map rbd_test_$rbd_device` #/dev/rbd0 /dev/rbd1 etc
+     echo "MAPPED_LOCATION is $MAPPED_LOCATION" #delete later
      RBD_MAP_LIST+=($MAPPED_LOCATION) #make and array of all of the /dev/rbd devices
      RBD_MOUNT_ARRAY[$MAPPED_LOCATION]=$rbd_device
      mkfs.xfs $MAPPED_LOCATION
@@ -114,6 +114,8 @@ function rbd_dd() {
    fi
  done
  
+ echo "RBD_MOUNT_ARRAY is ${RBD_MOUNT_ARRAY[*]}"
+ echo "RBD_MAP_LIST is ${RBD_MAP_LIST[*]}"
  
  START_TIME=`date +%s`
  END_TIME=$((START_TIME+TEST_TIME_IN_SEC))
