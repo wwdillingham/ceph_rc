@@ -126,10 +126,12 @@ function rbd_dd() {
    for RBD_DEV in "${RBD_MAP_LIST[@]}" #/dev/rbd0 etc
    do
      if [[ $RBD_DEV == ${RBD_MAP_LIST[-1]} ]]; then #if its the last element in the array, dont run in BG
-       dd if=/dev/zero of=/mnt/rbd_dd/${RBD_MAP_LIST[$RBD_DEV]} bs=${BLOCK_SIZE_IN_MB}M count=$COUNT oflag=direct 
+       echo "RBD_MOUNT_ARRAY[RBD_DEV] is ${RBD_MOUNT_ARRAY[$RBD_DEV]} - last element  " #remove later
+       dd if=/dev/zero of=/mnt/rbd_dd/${RBD_MOUNT_ARRAY[$RBD_DEV]} bs=${BLOCK_SIZE_IN_MB}M count=$COUNT oflag=direct 
        NUM_DD_STARTED=$((NUM_DD_STARTED+1))
      else #its not the last item in the array
-       dd if=/dev/zero of=/mnt/rbd_dd/${RBD_MAP_LIST[$RBD_DEV]} bs=${BLOCK_SIZE_IN_MB}M count=$COUNT oflag=direct &
+        echo "RBD_MOUNT_ARRAY[RBD_DEV] is ${RBD_MOUNT_ARRAY[$RBD_DEV]} - non-last element  " #remove later
+       dd if=/dev/zero of=/mnt/rbd_dd/${RBD_MOUNT_ARRAY[$RBD_DEV]} bs=${BLOCK_SIZE_IN_MB}M count=$COUNT oflag=direct &
        NUM_DD_STARTED=$((NUM_DD_STARTED+1))
      fi
    #nee to not perform last one as background process, we will use the last of the group to indicate when it is ready to move on to another cycle. At which point we will process another round if and only if the time has not expired.
