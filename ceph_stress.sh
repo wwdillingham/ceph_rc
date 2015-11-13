@@ -111,7 +111,7 @@ function rbd_dd() {
  START_TIME=`date +%s`
  END_TIME=$((START_TIME+TEST_TIME_IN_SEC))
  NUM_DD_STARTED=0
- while [ `date %s` -lt $END_TIME ]
+ while [ `date +%s` -lt $END_TIME ]
  do
  NUM_DD_STARTED=0
    for RBD_DEV in "${RBD_MAP_LIST[@]}" #/dev/rbd0 etc
@@ -196,38 +196,38 @@ do
   fi
 done
 
-if ! [[ $NUM_BLOCK_DEVICE =~ ^[1-9][0-9]+$ ]]; then
+if ! [[ $NUM_BLOCK_DEVICE =~ ^[1-9]+[0-9]*$ ]]; then
   echo "ERROR: --num_block_devices must be a positive integer"
   print_help
   exit
 fi
-if ! [[ $SIZE_BLOCK_DEVICE =~ ^[1-9][0-9]+$ ]]; then
+if ! [[ $SIZE_BLOCK_DEVICE =~ ^[1-9]+[0-9]*$ ]]; then
   echo "ERROR: --block_device_size must be a positive integer"
   print_help
   exit
 fi
-if ! [[ $BLOCK_SIZE_IN_MB =~ ^[1-9][0-9]+$ ]]; then
+if ! [[ $BLOCK_SIZE_IN_MB =~ ^[1-9]+[0-9]* ]]; then
   echo "ERROR: --block_size must be a positive integer"
   print_help
   exit
 fi
-if ! [[ $TEST_TIME_IN_SEC =~ ^[1-9][0-9]+$ ]]; then
+if ! [[ $TEST_TIME_IN_SEC =~ ^[1-9]+[0-9]*$ ]]; then
   echo "ERROR: --time must be a positive integer"
   print_help
   exit
 fi
-if ! [[ $REPLICATION_SIZE =~ ^[2-9][0-9]+$ ]]; then
+if ! [[ $REPLICATION_SIZE =~ ^[2-9]+[0-9]*$ ]]; then
   echo "ERROR: --replication_size must be a positive integer greater than 2"
   print_help
   exit
 fi
 
-if ! [[ $POOL_NAME =~ ^[0-9A-Za-z_]+$ ]]; then
+if ! [[ $POOL_NAME =~ ^[0-9A-Za-z_]*$ ]]; then
   echo  "ERROR: --pool must be alphanumberic, including underscores, no spaces"
   print_help
   exit
 fi
-if ! [[ $PG_NUM =~ ^[2-9][0-9]+$ ]]; then
+if ! [[ $PG_NUM =~ ^[2-9]+[0-9]*$ ]]; then
   echo  "ERROR: --pg_num must be a positive integer greater than 2"
   print_help
   exit
@@ -276,17 +276,17 @@ fi
 
 done  
   
-if ! [[ $NUM_BLOCK_DEVICE =~ ^[1-9][0-9]+$ ]]; then
+if ! [[ $NUM_BLOCK_DEVICE =~ ^[1-9]+[0-9]*$ ]]; then
   echo "ERROR: --num_block_devices must be a positive integer"
   print_help
   exit
 fi
-if ! [[ $SIZE_BLOCK_DEVICE =~ ^[1-9][0-9]+$ ]]; then
+if ! [[ $SIZE_BLOCK_DEVICE =~ ^[1-9]+[0-9]*$ ]]; then
   echo "ERROR: --block_device_size must be a positive integer"
   print_help
   exit
 fi
-if ! [[ $REPLICATION_SIZE =~ ^[2-9][0-9]+$ ]]; then
+if ! [[ $REPLICATION_SIZE =~ ^[2-9]+[0-9]*$ ]]; then
   echo "ERROR: --replication_size must be a positive integer greater than 2"
   print_help
   exit
@@ -297,7 +297,7 @@ if ! [[ $POOL_NAME =~ ^[0-9A-Za-z_]+$ ]]; then
   print_help
   exit
 fi
-if ! [[ $PG_NUM =~ ^[2-9][0-9]+$ ]]; then
+if ! [[ $PG_NUM =~ ^[2-9]+[0-9]*$ ]]; then
   echo  "ERROR: --pg_num must be a positive integer greater than 2"
   print_help
   exit
@@ -339,7 +339,7 @@ function check_input_args_for_rados_bench() {
     fi
   done
 
-  if ! [[ $REPLICATION_SIZE =~ ^[2-9][0-9]+$ ]]; then
+  if ! [[ $REPLICATION_SIZE =~ ^[2-9]+[0-9]*$ ]]; then
     echo "ERROR: --replication_size must be a positive integer greater than 2"
     print_help
     exit
@@ -349,7 +349,7 @@ function check_input_args_for_rados_bench() {
     print_help
     exit
   fi
-  if ! [[ $PG_NUM =~ ^[2-9][0-9]+$ ]]; then
+  if ! [[ $PG_NUM =~ ^[2-9]+[0-9]*$ ]]; then
     echo  "ERROR: --pg_num must be a positive integer greater than 2"
     print_help
     exit
@@ -359,12 +359,12 @@ function check_input_args_for_rados_bench() {
     print_help
     exit
   fi
-  if ! [[ $ops =~ ^[1-9][0-9]+$ ]]; then
+  if ! [[ $ops =~ ^[1-9]+[0-9]*$ ]]; then
     echo "ERROR --ops must be a positive integer"
     print_help
     exit
   fi
-  if ! [[ $TEST_TIME_IN_SEC =~ ^[1-9][0-9]+$ ]]; then
+  if ! [[ $TEST_TIME_IN_SEC =~ ^[1-9]+[0-9]*$ ]]; then
     echo "ERROR: --time must be a positive integer"
     print_help
     exit
