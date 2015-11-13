@@ -243,6 +243,8 @@ if ! [ -z $POOL_NAME ]; then #if pool is passed to script, then lets try to crea
   check_create_pool $POOL_NAME $PG_NUM $REPLICATION_SIZE
 fi
 
+rbd_dd $TEST_TIME_IN_SEC $TEST_MODE $CONCURRENT_OPERATIONS $OPERATION_SIZE_IN_MB $POOL_NAME
+
 }
 
 
@@ -406,8 +408,7 @@ elif [[ $1 == "rbd_dd" ]]; then
 	  echo "Wrong number of arguments received for rbd_dd"
 	  print_help
 	  exit
-	fi 
-	rbd_dd $2 $3 $4 $5 $6 
+	fi  
 elif [[ $1 == "rbd_bonnie" ]]; then
 	echo "Performing rbd mounts and doing a bonnie run upon that rbd mount"
   if [[ $# -eq 5 || $# -eq 7 ]]; then
