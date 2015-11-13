@@ -208,8 +208,8 @@ if ! [[ $NUM_BLOCK_DEVICE =~ ^[1-9]+[0-9]*$ ]]; then
   print_help
   exit
 fi
-if ! [[ $SIZE_BLOCK_DEVICE =~ ^[1-9]+[0-9]*$ ]]; then
-  echo "ERROR: --block_device_size must be a positive integer"
+if ! [[ $SIZE_BLOCK_DEVICE =~ ^[1-9]+[0-9][0-9][0-9]*$ ]]; then
+  echo "ERROR: --block_device_size must be a positive integer greater than or equal to 1000"
   print_help
   exit
 fi
@@ -265,9 +265,10 @@ fi
   if [[ $KEY == "--num_block_devices" ]]; then
     NUM_BLOCK_DEVICE=$VALUE
   fi
-  if [[ $KEY == "--block_device_size" ]]; then
-    SIZE_BLOCK_DEVICE=$VALUE
-    echo "Size block device is $SIZE_BLOCK_DEVICE"
+  if ! [[ $SIZE_BLOCK_DEVICE =~ ^[1-9]+[0-9][0-9][0-9]*$ ]]; then
+    echo "ERROR: --block_device_size must be a positive integer greater than or equal to 1000"
+    print_help
+    exit
   fi
   if [[ $KEY == "--pool" ]]; then
     POOL_NAME=$VALUE
@@ -290,8 +291,8 @@ if ! [[ $NUM_BLOCK_DEVICE =~ ^[1-9]+[0-9]*$ ]]; then
   print_help
   exit
 fi
-if ! [[ $SIZE_BLOCK_DEVICE =~ ^[1-9]+[0-9]*$ ]]; then
-  echo "ERROR: --block_device_size must be a positive integer"
+if ! [[ $SIZE_BLOCK_DEVICE =~ ^[1-9]+[0-9][0-9][0-9]*$ ]]; then
+  echo "ERROR: --block_device_size must be a positive integer greater than or equal to 1000"
   print_help
   exit
 fi
@@ -300,7 +301,6 @@ if ! [[ $REPLICATION_SIZE =~ ^[2-9]+[0-9]*$ ]]; then
   print_help
   exit
 fi
-
 if ! [[ $POOL_NAME =~ ^[0-9A-Za-z_]+$ ]]; then
   echo  "ERROR: --pool must be alphanumberic, including underscores, no spaces"
   print_help
