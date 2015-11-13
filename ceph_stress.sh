@@ -81,7 +81,7 @@ function rbd_dd() {
  echo "TEST_TIME_IN_SEC $TEST_TIME_IN_SEC"
  echo "POOL_NAME $POOL_NAME" 
  
- COUNT= $SIZE_BLOCK_DEVICE / $BLOCK_SIZE_IN_MB
+ COUNT=$((SIZE_BLOCK_DEVICE / BLOCK_SIZE_IN_MB))
  #first create the rbd devices and prep their mount points
  if ! [ -d /mnt/rbd_dd ]; then
    mkdir /mnt/rbd_dd
