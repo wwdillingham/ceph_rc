@@ -139,11 +139,16 @@ function rbd_dd() {
         echo "block size is ${BLOCK_SIZE_IN_MB}" #remove later
         echo "count is $COUNT" #Remove later
         echo "dd if=/dev/zero of=/mnt/rbd_dd/${RBD_MOUNT_ARRAY[$RBD_DEV]}/testfile bs=${BLOCK_SIZE_IN_MB}M count=$COUNT oflag=direct & not last" #remove late
-
+        #need to not perform last one as background process, we will use the last of the group to indicate when it is ready to move on to another cycle.
        dd if=/dev/zero of=/mnt/rbd_dd/${RBD_MOUNT_ARRAY[$RBD_DEV]}/testfile bs=${BLOCK_SIZE_IN_MB}M count=$COUNT oflag=direct &
        NUM_DD_STARTED=$((NUM_DD_STARTED+1))
      fi
-   #nee to not perform last one as background process, we will use the last of the group to indicate when it is ready to move on to another cycle. At which point we will process another round if and only if the time has not expired.
+    done
+    #ALL DDs in this cycle have ran, we need to remove the testfiles on the device so we can rerun the dd without filling up the device.
+    for TESTFILE in {1..$NUM_DD_STARTED}
+    do
+      rm -f /mnt/rbd_dd/$TESTFILE/testfile
+      echo "rm -f /mnt/rbd_dd/$TESTFILE/testfile"
     done
   done
   FINISHED_TIME=`date +%s`
