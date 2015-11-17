@@ -98,7 +98,7 @@ function rbd_dd() {
      echo "MAPPED_LOCATION is $MAPPED_LOCATION" #delete later
      RBD_MAP_LIST+=($MAPPED_LOCATION) #make and array of all of the /dev/rbd devices
      RBD_MOUNT_ARRAY[$MAPPED_LOCATION]=$rbd_device
-     mkfs.xfs $MAPPED_LOCATION
+     mkfs.xfs $MAPPED_LOCATION &> /dev/null
      mount $MAPPED_LOCATION /mnt/rbd_dd/$rbd_device
    else
      echo "ERROR: /mnt/rbd_dd/$rbd_device already exists"
