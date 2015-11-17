@@ -117,9 +117,6 @@ function rbd_dd() {
    fi
  done
  
- echo "RBD_MOUNT_ARRAY is ${RBD_MOUNT_ARRAY[*]}"
- echo "RBD_MAP_LIST is ${RBD_MAP_LIST[*]}"
- 
  START_TIME=`date +%s`
  END_TIME=$((START_TIME+TEST_TIME_IN_SEC))
  echo "original start time is $START_TIME"
