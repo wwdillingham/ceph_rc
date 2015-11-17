@@ -124,15 +124,14 @@ function rbd_dd() {
  END_TIME=$((START_TIME+TEST_TIME_IN_SEC))
  echo "original start time is $START_TIME"
  echo "Original endtime is $END_TIME"
- NUM_DD_STARTED=0
- ENDROUND=0
- while [ $ENDROUND -lt $END_TIME ]
+ NUM_DD_STARTED=0 #nuber of dds to be run per loop iteration
+ NUM_ROUNDS=0 #number of iterations
+ END_ROUND_TIME=0 #will be updated with current time at the end of each loop iteration
+ while [ $END_ROUND_TIME -lt $END_TIME ]
  do
  NUM_DD_STARTED=0
    for RBD_DEV in "${RBD_MAP_LIST[@]}" #/dev/rbd0 etc
    do
-     NOW=`date +%s`
-     echo "Just started a round at $NOW"
      if [[ $RBD_DEV == ${RBD_MAP_LIST[-1]} ]]; then #if its the last element in the array, dont run in BG
        dd if=/dev/zero of=/mnt/rbd_dd/${RBD_MOUNT_ARRAY[$RBD_DEV]}/testfile bs=${BLOCK_SIZE_IN_MB}M count=$COUNT oflag=direct &> /dev/null 
        NUM_DD_STARTED=$((NUM_DD_STARTED+1))
@@ -149,15 +148,15 @@ function rbd_dd() {
       rm -f /mnt/rbd_dd/$TESTFILE/testfile
       REMOVER=$(($REMOVER+1))
     done
-    ENDROUND=`date +%s`
-    echo "Just finished a round at $ENDROUND"
+    END_ROUND_TIME=`date +%s`
+    NUM_ROUNDs=$((NUM_ROUNDS+1))
   done
   FINISHED_TIME=`date +%s`
   TIME_RAN=$((FINISHED_TIME-START_TIME))
-  TOTAL_MB_TRANSFERRED=$((BLOCK_SIZE_IN_MB*COUNT*NUM_DD_STARTED))
+  TOTAL_MB_TRANSFERRED=$((BLOCK_SIZE_IN_MB*COUNT*NUM_DD_STARTED*NUM_ROUNDS))
   MB_PER_SECOND=$((TOTAL_MB_TRANSFERRED/TIME_RAN))
-  echo "Start Time: $START_TIME"
-  echo "Finish Time: $FINISHED_TIME"
+  echo "Peformed $NUM_DD_STARTED dd operations $NUM_ROUNDS times in $TIME_RAN seconds:"
+  echo "Actual Seconds: $TIME_RAN"
   echo "Total MB xfer: $TOTAL_MB_TRANSFERRED"
   echo "Average MB/s xfer: $MB_PER_SECOND"
   
