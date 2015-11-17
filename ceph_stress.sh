@@ -75,11 +75,6 @@ function rbd_dd() {
  TEST_TIME_IN_SEC=$4
  POOL_NAME=$5
  
- echo "NUM_BLOCK_DEVICE $NUM_BLOCK_DEVICE"
- echo "SIZE_BLOCK_DEVICE $SIZE_BLOCK_DEVICE"
- echo "BLOCK_SIZE_IN_MB $BLOCK_SIZE_IN_MB"
- echo "TEST_TIME_IN_SEC $TEST_TIME_IN_SEC"
- echo "POOL_NAME $POOL_NAME" 
  
  echo "SIZE_BLOCK_DEVICE is $SIZE_BLOCK_DEVICE" #remove later
  echo "BLOCK_SIZE_IN_MB $BLOCK_SIZE_IN_MB" #remove later
@@ -407,8 +402,6 @@ function check_input_args_for_rbd_benchwrite() {
 
 #Handle command line argument input
 
-echo "dollar sign 1: $1"
-echo "dollar sign 2: $2"
 
 if [[ $1 == "--help" || $1 == "help" || $1 == "-h" ]]; then
 	print_help
