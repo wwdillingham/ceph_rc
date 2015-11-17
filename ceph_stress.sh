@@ -121,24 +121,20 @@ function rbd_dd() {
  
  START_TIME=`date +%s`
  END_TIME=$((START_TIME+TEST_TIME_IN_SEC))
+ echo "original start time is $START_TIME"
+ echo "Original endtime is $END_TIME"
  NUM_DD_STARTED=0
  while [ `date +%s` -lt $END_TIME ]
  do
  NUM_DD_STARTED=0
    for RBD_DEV in "${RBD_MAP_LIST[@]}" #/dev/rbd0 etc
    do
+     NOW=`date +%s`
+     echo "Just started a round at $NOW"
      if [[ $RBD_DEV == ${RBD_MAP_LIST[-1]} ]]; then #if its the last element in the array, dont run in BG
-       echo "RBD_MOUNT_ARRAY[RBD_DEV] is ${RBD_MOUNT_ARRAY[$RBD_DEV]} - last element  " #remove later
-       echo "block size is ${BLOCK_SIZE_IN_MB}" #remove later
-       echo "count is $COUNT" #Remove later
-       echo "dd if=/dev/zero of=/mnt/rbd_dd/${RBD_MOUNT_ARRAY[$RBD_DEV]}/testfile bs=${BLOCK_SIZE_IN_MB}M count=$COUNT oflag=direct last element" #remove later
        dd if=/dev/zero of=/mnt/rbd_dd/${RBD_MOUNT_ARRAY[$RBD_DEV]}/testfile bs=${BLOCK_SIZE_IN_MB}M count=$COUNT oflag=direct 
        NUM_DD_STARTED=$((NUM_DD_STARTED+1))
      else #its not the last item in the array
-        echo "RBD_MOUNT_ARRAY[RBD_DEV] is ${RBD_MOUNT_ARRAY[$RBD_DEV]} - non-last element  " #remove later
-        echo "block size is ${BLOCK_SIZE_IN_MB}" #remove later
-        echo "count is $COUNT" #Remove later
-        echo "dd if=/dev/zero of=/mnt/rbd_dd/${RBD_MOUNT_ARRAY[$RBD_DEV]}/testfile bs=${BLOCK_SIZE_IN_MB}M count=$COUNT oflag=direct & not last" #remove late
         #need to not perform last one as background process, we will use the last of the group to indicate when it is ready to move on to another cycle.
        dd if=/dev/zero of=/mnt/rbd_dd/${RBD_MOUNT_ARRAY[$RBD_DEV]}/testfile bs=${BLOCK_SIZE_IN_MB}M count=$COUNT oflag=direct &
        NUM_DD_STARTED=$((NUM_DD_STARTED+1))
@@ -149,9 +145,10 @@ function rbd_dd() {
     while [ $REMOVER -le $NUM_DD_STARTED ]; 
     do
       rm -f /mnt/rbd_dd/$TESTFILE/testfile
-      echo "rm -f /mnt/rbd_dd/$REMOVER/testfile"
       REMOVER=$(($REMOVER+1))
     done
+    ENDROUND=`date +%s`
+    echo "Just finished a round at $ENDROUND"
   done
   FINISHED_TIME=`date +%s`
   TIME_RAN=$((FINISHED_TIME-START_TIME))
