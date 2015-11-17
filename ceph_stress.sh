@@ -125,7 +125,8 @@ function rbd_dd() {
  echo "original start time is $START_TIME"
  echo "Original endtime is $END_TIME"
  NUM_DD_STARTED=0
- while [ `date +%s` -lt $END_TIME ]
+ ENDROUND=0
+ while [ $ENDROUND -lt $END_TIME ]
  do
  NUM_DD_STARTED=0
    for RBD_DEV in "${RBD_MAP_LIST[@]}" #/dev/rbd0 etc
