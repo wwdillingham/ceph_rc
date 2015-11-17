@@ -131,7 +131,7 @@ function rbd_dd() {
        echo "RBD_MOUNT_ARRAY[RBD_DEV] is ${RBD_MOUNT_ARRAY[$RBD_DEV]} - last element  " #remove later
        echo "block size is ${BLOCK_SIZE_IN_MB}" #remove later
        echo "count is $COUNT" #Remove later
-       echo "dd if=/dev/zero of=/mnt/rbd_dd/${RBD_MOUNT_ARRAY[$RBD_DEV}/testfile bs=${BLOCK_SIZE_IN_MB}M count=$COUNT oflag=direct last element" #remove later
+       echo "dd if=/dev/zero of=/mnt/rbd_dd/${RBD_MOUNT_ARRAY[$RBD_DEV]}/testfile bs=${BLOCK_SIZE_IN_MB}M count=$COUNT oflag=direct last element" #remove later
        dd if=/dev/zero of=/mnt/rbd_dd/${RBD_MOUNT_ARRAY[$RBD_DEV]}/testfile bs=${BLOCK_SIZE_IN_MB}M count=$COUNT oflag=direct 
        NUM_DD_STARTED=$((NUM_DD_STARTED+1))
      else #its not the last item in the array
