@@ -149,7 +149,7 @@ function rbd_dd() {
       REMOVER=$(($REMOVER+1))
     done
     END_ROUND_TIME=`date +%s`
-    NUM_ROUNDs=$((NUM_ROUNDS+1))
+    NUM_ROUNDS=$((NUM_ROUNDS+1))
   done
   FINISHED_TIME=`date +%s`
   TIME_RAN=$((FINISHED_TIME-START_TIME))
