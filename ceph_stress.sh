@@ -149,7 +149,7 @@ function rbd_dd() {
     while [ $REMOVER -le $NUM_DD_STARTED ]; 
     do
       rm -f /mnt/rbd_dd/$TESTFILE/testfile
-      echo "rm -f /mnt/rbd_dd/$TESTFILE/testfile"
+      echo "rm -f /mnt/rbd_dd/$REMOVER/testfile"
       REMOVER=$(($REMOVER+1))
     done
   done
