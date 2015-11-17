@@ -145,10 +145,12 @@ function rbd_dd() {
      fi
     done
     #ALL DDs in this cycle have ran, we need to remove the testfiles on the device so we can rerun the dd without filling up the device.
-    for TESTFILE in {1..$NUM_DD_STARTED}
+    REMOVER=1
+    while [ $REMOVER -le $NUM_DD_STARTED ]; 
     do
       rm -f /mnt/rbd_dd/$TESTFILE/testfile
       echo "rm -f /mnt/rbd_dd/$TESTFILE/testfile"
+      REMOVER=$(($REMOVER+1))
     done
   done
   FINISHED_TIME=`date +%s`
