@@ -76,10 +76,14 @@ function rbd_dd() {
  POOL_NAME=$5
  
  
- echo "SIZE_BLOCK_DEVICE is $SIZE_BLOCK_DEVICE" #remove later
- echo "BLOCK_SIZE_IN_MB $BLOCK_SIZE_IN_MB" #remove later
+ 
+ #NEED TO INTELLIGENTLY REFACTOR
  COUNT=$((SIZE_BLOCK_DEVICE / BLOCK_SIZE_IN_MB))
  COUNT=$((COUNT-250))
+ 
+ 
+ 
+ 
  #first create the rbd devices and prep their mount points
  if ! [ -d /mnt/rbd_dd ]; then
    mkdir /mnt/rbd_dd
@@ -95,7 +99,6 @@ function rbd_dd() {
      rbd -p $POOL_NAME create --size $SIZE_BLOCK_DEVICE rbd_test_$rbd_device
      #the output of the rbd map command is the /dev/rbdX that it gets mapped to exectute cmd and set variable:
      MAPPED_LOCATION=`rbd -p $POOL_NAME map rbd_test_$rbd_device` #/dev/rbd0 /dev/rbd1 etc
-     echo "MAPPED_LOCATION is $MAPPED_LOCATION" #delete later
      RBD_MAP_LIST+=($MAPPED_LOCATION) #make and array of all of the /dev/rbd devices
      RBD_MOUNT_ARRAY[$MAPPED_LOCATION]=$rbd_device
      mkfs.xfs $MAPPED_LOCATION &> /dev/null
