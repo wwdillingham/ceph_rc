@@ -84,7 +84,7 @@ function rbd_dd() {
  echo "SIZE_BLOCK_DEVICE is $SIZE_BLOCK_DEVICE" #remove later
  echo "BLOCK_SIZE_IN_MB $BLOCK_SIZE_IN_MB" #remove later
  COUNT=$((SIZE_BLOCK_DEVICE / BLOCK_SIZE_IN_MB))
- COUNT=$((COUNT-1))
+ COUNT=$((COUNT-10))
  #first create the rbd devices and prep their mount points
  if ! [ -d /mnt/rbd_dd ]; then
    mkdir /mnt/rbd_dd
