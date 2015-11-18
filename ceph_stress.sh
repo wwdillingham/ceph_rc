@@ -58,6 +58,7 @@ function print_help() {
 }
 
 function unmount_rbd_device() {
+  echo "Attempting to unmount filesystem: $1"
   umount $1
 }
 
