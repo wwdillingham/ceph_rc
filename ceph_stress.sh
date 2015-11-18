@@ -59,7 +59,10 @@ function print_help() {
 
 function unmount_rbd_devices() {
   #This function unmounts the filesystems that live on rbd devices
-  for i in `mount | grep -i rbd | cut -d" " -f1`; echo "will unmount $i" &&  do umount $i; done
+  for i in `mount | grep -i rbd | cut -d" " -f1`
+  do 
+   echo "will unmount $i" && umount $i
+  done
 }
 
 function unmap_rbd_devices() {
