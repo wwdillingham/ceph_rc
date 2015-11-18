@@ -111,9 +111,8 @@ function rbd_dd() {
 #################################
  
  
- #NEED TO INTELLIGENTLY REFACTOR
- COUNT=$((SIZE_BLOCK_DEVICE / BLOCK_SIZE_IN_MB))
- COUNT=$((COUNT-250))
+ COUNT=$((SIZE_BLOCK_DEVICE / BLOCK_SIZE_IN_MB)) #Runs the risk of filling filesystem and botching the dd
+ COUNT=$((COUNT*.9)) #Reduce Count by approximately 10% in size to allow for filesystem overhead etc
 
 
  #first create the rbd devices and prep their mount points
