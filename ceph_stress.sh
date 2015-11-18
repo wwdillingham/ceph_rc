@@ -57,18 +57,13 @@ function print_help() {
         echo "NEED TO WRITE THESE"
 }
 
-function unmount_rbd_devices() {
-  #This function unmounts the filesystems that live on rbd devices
-  echo "in unmount_rbd_devices"
-  for i in `mount | grep -i rbd | cut -d" " -f1`
-  do 
-   echo "will unmount $i" && umount $i
-  done
+function unmount_rbd_device() {
+  umount $1
 }
 
 function unmap_rbd_devices() {
   #This function unmaps the block device from the kernel (i.e. it removes /dev/rbd0 etc off the system)
-  echo "in unmap_rbd_devices"
+  echo "Attempting to unmap rbd device $1..."
   rbd unmap $1
 }
 
@@ -105,21 +100,21 @@ function check_create_pool() {
 
 
 function rbd_dd() {
+  
+#####INPUT VARIABLE REFERENCE####
  NUM_BLOCK_DEVICE=$1
  SIZE_BLOCK_DEVICE=$2
  BLOCK_SIZE_IN_MB=$3
  TEST_TIME_IN_SEC=$4
  POOL_NAME=$5
- 
+#################################
  
  
  #NEED TO INTELLIGENTLY REFACTOR
  COUNT=$((SIZE_BLOCK_DEVICE / BLOCK_SIZE_IN_MB))
  COUNT=$((COUNT-250))
- 
- 
- 
- 
+
+
  #first create the rbd devices and prep their mount points
  if ! [ -d /mnt/rbd_dd ]; then
    mkdir /mnt/rbd_dd
@@ -196,11 +191,13 @@ function rbd_dd() {
   echo "**********************************************************"
   echo "\n"
   
-  echo "Do you want to unmount the filesystems on the rbd devices? [y/n]"
+  echo "Do you want to unmount the filesystems ontop of the rbd devies we just created? [y/n]"
   read UNMOUNT_FS_DECISION
   if [[ UNMOUNT_FS_DECISION -eq "y" || UNMOUNT_FS_DECISION -eq "Y" ]]; then
-    echo "about to call unmount function"
-    unmount_rbd_devices
+    for MOUNT_POINT in ${RBD_MOUNT_ARRAY[@]}
+    do
+      echo "mount point variable is $MOUNT_POINT"
+      unmount_rbd_device $MOUNT_POINT
   fi
   echo "Do you want to unmap /all/ rbd devices from the kernel? [y/n]"
   read UNMAP_RBD_DECISION
