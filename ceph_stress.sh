@@ -189,7 +189,7 @@ function rbd_dd() {
   echo "Total MB Transferred: $TOTAL_MB_TRANSFERRED"
   echo "Average MB/s xfer: $MB_PER_SECOND"
   echo "**********************************************************"
-  echo "\n"
+  echo -e "\n"
   
   echo "Do you want to unmount the filesystems ontop of the rbd devies we just created? [y/n]"
   read UNMOUNT_FS_DECISION
