@@ -199,7 +199,10 @@ function rbd_dd() {
   echo "Do you want to unmount the filesystems on the rbd devices? [y/n]"
   read UNMOUNT_FS_DECISION
   if [[ UNMOUNT_FS_DECISION == "y" || UNMOUNT_FS_DECISION == "Y" ]]; then
+    echo "about to call unmount function"
     unmount_rbd_devices
+  else
+    echo "not calling unmount function because if evaluated to false"
   fi
   echo "Do you want to unmap /all/ rbd devices from the kernel? [y/n]"
   read UNMAP_RBD_DECISION
