@@ -399,7 +399,29 @@ function check_input_args_for_rbd_benchwrite() {
   echo "this is a placeholder"
 }
 
+function unmount_rbd_devices() {
+  #This function unmounts the filesystems that live on rbd devices
+  for i in `mount | grep -i rbd | cut -d" " -f1`; do umount $i; done
+}
 
+function unmap_rbd_devices() {
+  #This function unmaps the block device from the kernel (i.e. it removes /dev/rbd0 etc off the system)
+  for i in `rbd showmapped | grep rbd | awk -F" " '{print $5}'`; do rbd unmap $i; done
+}
+
+function remove_test_pool() {
+  #This function attempts to remove the pool which is passed to it
+  POOL_TO_REMOVE=$1
+  echo "Do you want to remove the pool: $POOL_TO_REMOVE"
+  echo "This will permanently destory all data in that pool"
+  echo "Be very careful this pool isnt in use outside of this individual benchmark test"
+  echo "If you definitely want to remove it please type:"
+  echo "YES-I-WANT-TO-DELETE-THIS-POOL-$POOL_TO_REMOVE"
+  read REMOVAL_DECISION
+  if [[ $REMOVAL_DECISION == "YES-I-WANT-TO-DELETE-THIS-POOL-$POOL_TO_REMOVE" ]]; then
+    ceph osd pool delete $POOL_TO_REMOVE $POOL_TO_REMOVE --yes-i-really-really-mean-it
+  fi
+}
 
 
 
