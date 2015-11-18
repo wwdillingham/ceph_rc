@@ -150,10 +150,37 @@ function rbd_dd() {
   TIME_RAN=$((FINISHED_TIME-START_TIME))
   TOTAL_MB_TRANSFERRED=$((BLOCK_SIZE_IN_MB*COUNT*NUM_DD_STARTED*NUM_ROUNDS))
   MB_PER_SECOND=$((TOTAL_MB_TRANSFERRED/TIME_RAN))
+  
+  
+  echo "**********************RESULTS*****************************"
   echo "Peformed $NUM_DD_STARTED dd operations $NUM_ROUNDS times in $TIME_RAN seconds:"
   echo "Actual Seconds: $TIME_RAN"
-  echo "Total MB xfer: $TOTAL_MB_TRANSFERRED"
+  echo "Total MB Transferred: $TOTAL_MB_TRANSFERRED"
   echo "Average MB/s xfer: $MB_PER_SECOND"
+  echo "**********************************************************"
+  echo "\n"
+  
+  echo "Do you want to unmount the filesystems on the rbd devices? [y/n]"
+  read UNMOUNT_FS_DECISION
+  if [[ UNMOUNT_FS_DECISION == "y" || UNMOUNT_FS_DECISION == "Y" ]]; then
+    unmount_rbd_devices
+  fi
+  echo "Do you want to unmap /all/ rbd devices from the kernel? [y/n]"
+  read UNMAP_RBD_DECISION
+  if [[ UNMAP_RBD_DECISION == "y" || UNMAP_RBD_DECISION == "Y" ]]; then
+    unmap_rbd_devices
+  fi
+  echo "Do you want to remove the test directory structure at /mnt/rbd_dd [y/n]"
+  read REMOVE_TEST_DIR_DECISION
+  if [[ REMOVE_TEST_DIR_DECISION == "y" || REMOVE_TEST_DIR_DECISION == "Y" ]]; then
+    remove_rbd_dd_testdir
+  fi
+  echo "Do you want to remove the ceph pool used in this test [y/n]"
+  read REMOVE_TESTPOOL_DECISION
+  if [[ $REMOVE_TESTPOOL_DECISION == "y" || $REMOVE_TESTPOOL_DECISION == "Y" ]]; then
+    remove_test_pool $POOL_NAME
+  fi
+    
   
 }
 
