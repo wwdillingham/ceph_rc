@@ -423,6 +423,10 @@ function remove_test_pool() {
   fi
 }
 
+function remove_rbd_dd_testdir() {
+  rm -rf /mnt/rbd_dd
+}
+
 
 
 #Handle command line argument input
