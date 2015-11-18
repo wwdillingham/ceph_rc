@@ -198,15 +198,13 @@ function rbd_dd() {
   
   echo "Do you want to unmount the filesystems on the rbd devices? [y/n]"
   read UNMOUNT_FS_DECISION
-  if [[ UNMOUNT_FS_DECISION == "y" || UNMOUNT_FS_DECISION == "Y" ]]; then
+  if [[ UNMOUNT_FS_DECISION -eq "y" || UNMOUNT_FS_DECISION -eq "Y" ]]; then
     echo "about to call unmount function"
     unmount_rbd_devices
-  else
-    echo "not calling unmount function because if evaluated to false"
   fi
   echo "Do you want to unmap /all/ rbd devices from the kernel? [y/n]"
   read UNMAP_RBD_DECISION
-  if [[ UNMAP_RBD_DECISION == "y" || UNMAP_RBD_DECISION == "Y" ]]; then
+  if [[ UNMAP_RBD_DECISION -eq "y" || UNMAP_RBD_DECISION -eq "Y" ]]; then
     for RBD_DEV in "${RBD_MAP_LIST[@]}" #/dev/rbd0 etc
     do
       echo "will unmap $RDB_DEV"
@@ -215,12 +213,12 @@ function rbd_dd() {
   fi
   echo "Do you want to remove the test directory structure at /mnt/rbd_dd [y/n]"
   read REMOVE_TEST_DIR_DECISION
-  if [[ REMOVE_TEST_DIR_DECISION == "y" || REMOVE_TEST_DIR_DECISION == "Y" ]]; then
+  if [[ REMOVE_TEST_DIR_DECISION -eq "y" || REMOVE_TEST_DIR_DECISION -eq "Y" ]]; then
     remove_rbd_dd_testdir
   fi
   echo "Do you want to remove the ceph pool used in this test [y/n]"
   read REMOVE_TESTPOOL_DECISION
-  if [[ $REMOVE_TESTPOOL_DECISION == "y" || $REMOVE_TESTPOOL_DECISION == "Y" ]]; then
+  if [[ $REMOVE_TESTPOOL_DECISION -eq "y" || $REMOVE_TESTPOOL_DECISION -eq "Y" ]]; then
     remove_test_pool $POOL_NAME
   fi
     
