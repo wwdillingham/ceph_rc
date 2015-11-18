@@ -59,6 +59,7 @@ function print_help() {
 
 function unmount_rbd_devices() {
   #This function unmounts the filesystems that live on rbd devices
+  echo "in unmount_rbd_devices"
   for i in `mount | grep -i rbd | cut -d" " -f1`
   do 
    echo "will unmount $i" && umount $i
@@ -67,6 +68,7 @@ function unmount_rbd_devices() {
 
 function unmap_rbd_devices() {
   #This function unmaps the block device from the kernel (i.e. it removes /dev/rbd0 etc off the system)
+  echo "in unmap_rbd_devices"
   rbd unmap $1
 }
 
