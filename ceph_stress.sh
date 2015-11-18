@@ -168,7 +168,10 @@ function rbd_dd() {
   echo "Do you want to unmap /all/ rbd devices from the kernel? [y/n]"
   read UNMAP_RBD_DECISION
   if [[ UNMAP_RBD_DECISION == "y" || UNMAP_RBD_DECISION == "Y" ]]; then
-    unmap_rbd_devices
+    for RBD_DEV in "${RBD_MAP_LIST[@]}" #/dev/rbd0 etc
+    do
+      unmap_rbd_devices $RBD_DEV
+    done
   fi
   echo "Do you want to remove the test directory structure at /mnt/rbd_dd [y/n]"
   read REMOVE_TEST_DIR_DECISION
@@ -433,7 +436,7 @@ function unmount_rbd_devices() {
 
 function unmap_rbd_devices() {
   #This function unmaps the block device from the kernel (i.e. it removes /dev/rbd0 etc off the system)
-  for i in `rbd showmapped | grep rbd | awk -F" " '{print $5}'`; do rbd unmap $i; done
+  rbd unmap $1
 }
 
 function remove_test_pool() {
