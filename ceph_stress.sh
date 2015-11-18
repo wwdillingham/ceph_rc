@@ -57,6 +57,37 @@ function print_help() {
         echo "NEED TO WRITE THESE"
 }
 
+function unmount_rbd_devices() {
+  #This function unmounts the filesystems that live on rbd devices
+  for i in `mount | grep -i rbd | cut -d" " -f1`; echo "will unmount $i" &&  do umount $i; done
+}
+
+function unmap_rbd_devices() {
+  #This function unmaps the block device from the kernel (i.e. it removes /dev/rbd0 etc off the system)
+  rbd unmap $1
+}
+
+function remove_test_pool() {
+  #This function attempts to remove the pool which is passed to it
+  POOL_TO_REMOVE=$1
+  echo "Do you REALLY want to remove the pool: $POOL_TO_REMOVE ?"
+  echo "This will permanently destroy all data in that pool"
+  echo "Be very careful that this pool isnt in use outside of this individual benchmark test"
+  echo "If you definitely want to remove it please type:"
+  echo "YES-I-WANT-TO-DELETE-THIS-POOL-$POOL_TO_REMOVE"
+  read REMOVAL_DECISION
+  if [[ $REMOVAL_DECISION == "YES-I-WANT-TO-DELETE-THIS-POOL-$POOL_TO_REMOVE" ]]; then
+    ceph osd pool delete $POOL_TO_REMOVE $POOL_TO_REMOVE --yes-i-really-really-mean-it
+  else
+    echo "Will not remove any pools"
+  fi
+    
+}
+
+function remove_rbd_dd_testdir() {
+  rm -rf /mnt/rbd_dd
+}
+
 function check_create_pool() {
   if [[ `ceph osd lspools | grep -i "$1" | wc -l` == 0 ]]; then
     echo "Creating Pool: $1 with $2 placement groups and $3 replicas"
@@ -170,6 +201,7 @@ function rbd_dd() {
   if [[ UNMAP_RBD_DECISION == "y" || UNMAP_RBD_DECISION == "Y" ]]; then
     for RBD_DEV in "${RBD_MAP_LIST[@]}" #/dev/rbd0 etc
     do
+      echo "will unmap $RDB_DEV"
       unmap_rbd_devices $RBD_DEV
     done
   fi
@@ -428,38 +460,6 @@ function check_input_args_for_rados_bench() {
 function check_input_args_for_rbd_benchwrite() {
   echo "this is a placeholder"
 }
-
-function unmount_rbd_devices() {
-  #This function unmounts the filesystems that live on rbd devices
-  for i in `mount | grep -i rbd | cut -d" " -f1`; do umount $i; done
-}
-
-function unmap_rbd_devices() {
-  #This function unmaps the block device from the kernel (i.e. it removes /dev/rbd0 etc off the system)
-  rbd unmap $1
-}
-
-function remove_test_pool() {
-  #This function attempts to remove the pool which is passed to it
-  POOL_TO_REMOVE=$1
-  echo "Do you REALLY want to remove the pool: $POOL_TO_REMOVE ?"
-  echo "This will permanently destroy all data in that pool"
-  echo "Be very careful that this pool isnt in use outside of this individual benchmark test"
-  echo "If you definitely want to remove it please type:"
-  echo "YES-I-WANT-TO-DELETE-THIS-POOL-$POOL_TO_REMOVE"
-  read REMOVAL_DECISION
-  if [[ $REMOVAL_DECISION == "YES-I-WANT-TO-DELETE-THIS-POOL-$POOL_TO_REMOVE" ]]; then
-    ceph osd pool delete $POOL_TO_REMOVE $POOL_TO_REMOVE --yes-i-really-really-mean-it
-  else
-    echo "Will not remove any pools"
-  fi
-    
-}
-
-function remove_rbd_dd_testdir() {
-  rm -rf /mnt/rbd_dd
-}
-
 
 
 #Handle command line argument input
