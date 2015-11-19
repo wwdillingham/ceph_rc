@@ -198,6 +198,7 @@ function rbd_dd() {
     do
       echo "mount point variable is $MOUNT_POINT"
       unmount_rbd_device $MOUNT_POINT
+    done
   fi
   echo "Do you want to unmap /all/ rbd devices from the kernel? [y/n]"
   read UNMAP_RBD_DECISION
