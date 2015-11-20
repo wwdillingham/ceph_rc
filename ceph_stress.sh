@@ -58,13 +58,11 @@ function print_help() {
 }
 
 function unmount_rbd_device() {
-  echo "Attempting to unmount filesystem: $1"
   umount $1
 }
 
 function unmap_rbd_devices() {
   #This function unmaps the block device from the kernel (i.e. it removes /dev/rbd0 etc off the system)
-  echo "Attempting to unmap rbd device $1..."
   rbd unmap $1
 }
 
@@ -203,7 +201,7 @@ function rbd_dd() {
       unmount_rbd_device /mnt/rbd_dd/$MOUNT_POINT
     done
   fi
-  echo "Do you want to unmap /all/ rbd devices from the kernel? [y/n]"
+  echo "Do you want to unmap the rbd devices created in this test [y/n]"
   read UNMAP_RBD_DECISION
   if [[ UNMAP_RBD_DECISION -eq "y" || UNMAP_RBD_DECISION -eq "Y" ]]; then
     for RBD_DEV in "${RBD_MAP_LIST[@]}" #/dev/rbd0 etc
