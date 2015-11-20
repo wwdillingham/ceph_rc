@@ -200,7 +200,7 @@ function rbd_dd() {
     for MOUNT_POINT in ${RBD_MOUNT_ARRAY[@]}
     do
       echo "mount point variable is $MOUNT_POINT"
-      unmount_rbd_device $MOUNT_POINT
+      unmount_rbd_device /mnt/rbd_dd/$MOUNT_POINT
     done
   fi
   echo "Do you want to unmap /all/ rbd devices from the kernel? [y/n]"
