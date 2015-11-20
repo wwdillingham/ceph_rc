@@ -382,10 +382,8 @@ fi
   if [[ $KEY == "--num_block_devices" ]]; then
     NUM_BLOCK_DEVICE=$VALUE
   fi
-  if ! [[ $SIZE_BLOCK_DEVICE =~ ^[1-9]+[0-9][0-9][0-9]*$ ]]; then
-    echo "ERROR: --block_device_size must be a positive integer greater than or equal to 1000"
-    print_help
-    exit
+  if [[ $KEY == "--block_device_size" ]]; then
+    SIZE_BLOCK_DEVICE=$VALUE
   fi
   if [[ $KEY == "--pool" ]]; then
     POOL_NAME=$VALUE
@@ -403,8 +401,8 @@ fi
 
 done  
   
-if ! [[ $NUM_BLOCK_DEVICE =~ ^[1-9]+[0-9]*$ ]]; then
-  echo "ERROR: --num_block_devices must be a positive integer"
+if ! [[ $SIZE_BLOCK_DEVICE =~ ^[1-9]+[0-9][0-9][0-9]*$ ]]; then
+  echo "ERROR: --block_device_size must be a positive integer greater than or equal to 1000"
   print_help
   exit
 fi
@@ -428,6 +426,12 @@ if ! [[ $PG_NUM =~ ^[2-9]+[0-9]*$ && $PG_NUM -ge 2 ]]; then
   print_help
   exit
 fi
+  
+if ! [ -z $POOL_NAME ]; then #if pool is passed to script, then lets try to create it
+  check_create_pool $POOL_NAME $PG_NUM $REPLICATION_SIZE
+fi
+  
+rbd_bonnie $BONNIE_STRING $POOL_NAME $REPLICATION_SIZE $NUM_BLOCK_DEVICE $SIZE_BLOCK_DEVICE $PG_NUM
   
 }
 
