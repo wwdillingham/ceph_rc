@@ -112,9 +112,9 @@ function rbd_dd() {
  POOL_NAME=$5
 #################################
  
-#Reduce Count by approximately 10% in size to allow for filesystem overhead etc
+#Reduce dd Count by approximately 10% in size to allow for filesystem overhead etc
 #Runs the risk of filling filesystem and botching the dd
- REDUCER=.9
+ REDUCER=.9 #reduce count to 90% of its theoretical maximum
  COUNT=$( echo "${SIZE_BLOCK_DEVICE}/${BLOCK_SIZE_IN_MB}*${REDUCER}" |bc)
  COUNT=`echo $COUNT | cut -d"." -f1` #but the result needs to a whole number
  
@@ -243,9 +243,44 @@ function rbd_benchwrite() {
 
 
 function rbd_bonnie() {
+  #####INPUT VARIABLE REFERENCE####
  BONNIE_STRING=$1
  POOL_NAME=$2
  REPLICATION_SIZE=$3
+ NUM_BLOCK_DEVICE=$4
+ SIZE_BLOCK_DEVICE=$5
+ PG_NUM=$6
+ ##################################
+ 
+ if ! [ -d /mnt/rbd_bonnie ]; then
+   mkdir /mnt/rbd_bonnie
+ fi
+ RBD_MAP_LIST=()
+ declare -A RBD_MOUNT_ARRAY
+ 
+ #Make mountpoints, map them to rbd devices, build filesystems, mount filesystems
+ for rbd_device in `seq 1 $NUM_BLOCK_DEVICE`
+ do
+   if ! [ -d /mnt/rbd_bonnie/$rbd_device ]; then
+     mkdir /mnt/rbd_bonnie/$rbd_device
+     rbd -p $POOL_NAME create --size $SIZE_BLOCK_DEVICE rbd_test_$rbd_device
+     #the output of the rbd map command is the /dev/rbdX that it gets mapped to exectute cmd and set variable:
+     MAPPED_LOCATION=`rbd -p $POOL_NAME map rbd_test_$rbd_device` #/dev/rbd0 /dev/rbd1 etc
+     RBD_MAP_LIST+=($MAPPED_LOCATION) #make and array of all of the /dev/rbd devices
+     RBD_MOUNT_ARRAY[$MAPPED_LOCATION]=$rbd_device
+     mkfs.xfs $MAPPED_LOCATION &> /dev/null
+     mount $MAPPED_LOCATION /mnt/rbd_bonnie/$rbd_device
+   else
+     echo "ERROR: /mnt/rbd_bonnie/$rbd_device already exists"
+     echo "This is likely left over by a previous rbd_bonnie benchmark - please manually inspect"
+     echo "and remove any directories in /mnt/rbd_bonnie that are no longer needed"
+     echo "you may find the following useful:"
+     echo "rbd showmapped"
+     echo "mount | grep -i rbd"
+     echo "Will now abort process to prevent any damage"
+     exit
+   fi
+ done
  }
 
 function check_input_args_for_rbd_dd() {
