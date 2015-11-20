@@ -110,9 +110,12 @@ function rbd_dd() {
  POOL_NAME=$5
 #################################
  
+#Reduce Count by approximately 10% in size to allow for filesystem overhead etc
+#Runs the risk of filling filesystem and botching the dd
  REDUCER=.9
- COUNT=$((SIZE_BLOCK_DEVICE / BLOCK_SIZE_IN_MB)) #Runs the risk of filling filesystem and botching the dd
- COUNT=$((COUNT*REDUCER)) #Reduce Count by approximately 10% in size to allow for filesystem overhead etc
+ COUNT=$( echo "${SIZE_BLOCK_DEVICE}/${BLOCK_SIZE_IN_MB}*${REDUCER}" |bc)
+ COUNT=`echo $COUNT | cut -d"." -f1` #but the result needs to a whole number
+ 
 
 
  #first create the rbd devices and prep their mount points
