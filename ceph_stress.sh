@@ -87,6 +87,10 @@ function remove_rbd_dd_testdir() {
   rm -rf /mnt/rbd_dd
 }
 
+function remove_rbd_bonnie_testdir() {
+  rm -rf /mnt/rbd_bonnie
+}
+
 function check_create_pool() {
   if [[ `ceph osd lspools | grep -i "$1" | wc -l` == 0 ]]; then
     echo "Creating Pool: $1 with $2 placement groups and $3 replicas"
