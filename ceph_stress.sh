@@ -197,7 +197,6 @@ function rbd_dd() {
   if [[ UNMOUNT_FS_DECISION -eq "y" || UNMOUNT_FS_DECISION -eq "Y" ]]; then
     for MOUNT_POINT in ${RBD_MOUNT_ARRAY[@]}
     do
-      echo "mount point variable is $MOUNT_POINT"
       unmount_rbd_device /mnt/rbd_dd/$MOUNT_POINT
     done
   fi
@@ -206,7 +205,6 @@ function rbd_dd() {
   if [[ UNMAP_RBD_DECISION -eq "y" || UNMAP_RBD_DECISION -eq "Y" ]]; then
     for RBD_DEV in "${RBD_MAP_LIST[@]}" #/dev/rbd0 etc
     do
-      echo "will unmap $RDB_DEV"
       unmap_rbd_devices $RBD_DEV
     done
   fi
