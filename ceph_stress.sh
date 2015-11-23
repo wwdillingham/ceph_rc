@@ -97,7 +97,13 @@ function check_create_pool() {
     ceph osd pool create $1 $2
     ceph osd pool set $1 size $3
   else
-    echo "That pool already exists - will use it for testing"
+    echo "That pool already exists - do you want to use it for testing [y/n]"
+    read USEPOOLFORTESTING
+    if [[ $USEPOOLFORTESTING == "y" || $USEPOOLFORTESTING == "Y" ]]; then
+      echo "Confirmed - Will use $1 for testing"
+    else
+      "Aborting..."
+      exit
   fi
 }
 
