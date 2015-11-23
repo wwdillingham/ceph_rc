@@ -102,7 +102,7 @@ function check_create_pool() {
     if [[ $USEPOOLFORTESTING == "y" || $USEPOOLFORTESTING == "Y" ]]; then
       echo "Confirmed - Will use $1 for testing"
     else
-      "Aborting..."
+      echo "Aborting..."
       exit
   fi
 }
