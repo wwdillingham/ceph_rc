@@ -57,6 +57,30 @@ function print_help() {
         echo "NEED TO WRITE THESE"
 }
 
+function size_to_mbytes()
+{
+        local size=$1
+        shift
+
+        # Shave off the trailing [bB] in MB, GB, etc.
+        size=${size%[bB]}
+
+        case $size in
+        *[mM])
+                echo "${size%[mM]}"
+                ;;
+        *[gG])
+                echo "${size%[gG]} * 1024" | bc
+                ;;
+        *[tT])
+                echo "${size%[tT]} * 1024 * 1024" | bc
+                ;;
+        *)
+                echo "Unsupported unit on $size" 1>&2
+                return 1
+        esac
+}
+
 function unmount_rbd_device() {
   umount $1
 }
