@@ -15,9 +15,9 @@ YESTERDAY=`date +"%Y-%m-%d" --date="1 days ago"`
 
 #list all images in the pool
 
-IMAGES=`rbd ls $SOURCEPOOL`
+RBD_DEVICES=`rbd ls $SOURCEPOOL` #TODO need to make sure this isnt accounting for in pool snapshots (only backup incrementals of "live" images)
 
-for LOCAL_IMAGE in $IMAGES; do
+for LOCAL_IMAGE in $RBD_DEVICES; do
 
 	#check whether remote host/pool has image
 
